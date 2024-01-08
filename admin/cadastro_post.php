@@ -7,37 +7,33 @@ $fetchonerecord = new Categoria();
 $insertdata = new Post();
 
 if (isset($_POST['insert'])) {
-    $titulo = utf8_decode($_POST['titulo']);
+    $titulo = $_POST['titulo'];
     $categoria = $_POST['categoria'];
     $slug = $_POST['slug'];
-    $autor = utf8_decode($_POST['autor']);
+    $autor = $_POST['autor'];
     $data_post = $_POST['data_post'];
     $conteudo = $_POST['conteudo'];
-    $imagem = "";
     $destaque = isset($_POST['destaque']) ? 1 : 0;
+
+    $imagem = ""; // Caminho da imagem no banco de dados
     $imagem_path = "";
 
-    if (!empty($_FILES["imagem"]["name"])) {
+    // Verifique se um arquivo de imagem foi enviado
+    if (isset($_FILES["imagem"]["name"]) && $_FILES["imagem"]["error"] === UPLOAD_ERR_OK) {
         $imagem_path = "uploads/" . $_FILES["imagem"]["name"];
-        $check = getimagesize($_FILES["imagem"]["tmp_name"]);
 
-        if ($check !== false) {
-            if (move_uploaded_file($_FILES["imagem"]["tmp_name"], $imagem_path)) {
-                $imagem = $imagem_path;
-
-                // Redimensionar a imagem
-                require_once 'WideImage/WideImage.php';
-                $resizedImage = WideImage::load($imagem_path)->resize(null, 540, 'outside')->saveToFile($imagem_path);
-
-                echo "<script>alert('Imagem enviada com sucesso!');</script>";
-            } else {
-                echo "<script>alert('Erro ao enviar a imagem!');</script>";
-            }
+        if (move_uploaded_file($_FILES["imagem"]["tmp_name"], $imagem_path)) {
+            $imagem = $imagem_path;
+            echo "<script>alert('Imagem enviada com sucesso!');</script>";
         } else {
-            echo "<script>alert('O arquivo selecionado não é uma imagem válida!');</script>";
+            echo "<script>alert('Erro ao enviar a imagem!');</script>";
         }
     }
 
+     // Converta o título para UTF-8
+    $titulo = iconv("ISO-8859-1", "UTF-8", $titulo);
+
+    // Insira o post no banco de dados
     $sql = $insertdata->insert($titulo, $autor, $categoria, $data_post, $imagem, $conteudo, $slug, $destaque);
 
     if ($sql) {

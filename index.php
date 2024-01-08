@@ -1,14 +1,13 @@
 <?php 
-require_once "admin/functions/db_connect.php";
-require_once "admin/functions/functions.php";
+	require_once "admin/functions/db_connect.php";
+	require_once "admin/functions/functions.php";
 
-require "header.php";
-
+	require_once "header.php";
 ?>
 
-			<!-- trending-section 
-			================================================== -->
-			<section class="trending-section">
+		<!-- trending-section 
+		================================================== -->
+		<section class="trending-section">
 			<div class="container">
 				<div class="title-section">
 					<div class="row">
@@ -252,9 +251,9 @@ require "header.php";
 				<div class="fresh-box owl-wrapper">
 					
 					<div class="owl-carousel" data-num="4">
-					<?php 
-						$query = "SELECT * FROM posts ORDER BY data_post DESC";
-						$result = mysqli_query($mysqli, $query);
+						<?php 
+							$query = "SELECT * FROM posts ORDER BY data_post DESC";
+							$result = mysqli_query($mysqli, $query);
 
 							$result = mysqli_query($mysqli, $query);
 
@@ -272,10 +271,7 @@ require "header.php";
 								$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
 								$result_categoria = mysqli_query($mysqli, $query_categoria);
 								$row_categoria = mysqli_fetch_assoc($result_categoria);
-								$categoria = $row_categoria['categoria'];
-								
-								
-								
+								$categoria = $row_categoria['categoria'];	
 						?>
 					
 						<div class="item">
@@ -457,28 +453,26 @@ require "header.php";
 									<?php } ?>
 								</div>
 								<div class="item">
-								<?php 
-									// Trazer o post mais recente da categoria futebol
-									$query = "SELECT * FROM posts WHERE categoria = 4 ORDER BY data_post DESC LIMIT 1";
-									$result = mysqli_query($mysqli, $query);
+									<?php 
+										// Trazer o post mais recente da categoria futebol
+										$query = "SELECT * FROM posts WHERE categoria = 4 ORDER BY data_post DESC LIMIT 1";
+										$result = mysqli_query($mysqli, $query);
 													
-									while ($row = mysqli_fetch_assoc($result)) {
-										$id        = $row['id'];
-										$titulo    = $row['titulo'];
-										$autor     = $row['autor'];
-										$categoria = $row['categoria'];
-										$data_post = $row['data_post'];
-										$imagem    = $row['imagem'];
-										$conteudo  = $row['conteudo'];
-										$destaque  = $row['destaque'];
+										while ($row = mysqli_fetch_assoc($result)) {
+											$id        = $row['id'];
+											$titulo    = $row['titulo'];
+											$autor     = $row['autor'];
+											$categoria = $row['categoria'];
+											$data_post = $row['data_post'];
+											$imagem    = $row['imagem'];
+											$conteudo  = $row['conteudo'];
+											$destaque  = $row['destaque'];
 
-										// Consulta para obter o nome da categoria com base no ID
-										$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
-										$result_categoria = mysqli_query($mysqli, $query_categoria);
-										$row_categoria = mysqli_fetch_assoc($result_categoria);
-										$categoria = $row_categoria['categoria'];
-
-									
+											// Consulta para obter o nome da categoria com base no ID
+											$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
+											$result_categoria = mysqli_query($mysqli, $query_categoria);
+											$row_categoria = mysqli_fetch_assoc($result_categoria);
+											$categoria = $row_categoria['categoria'];
 									?>
 									<div class="news-post article-post">
 										<div class="image-holder">
@@ -501,12 +495,11 @@ require "header.php";
 									</div>
 									<?php } ?>
 								</div>
-								</div>
+							</div>
 						</div>
 					</div>
 					<div class="col-lg-4">
 						<div class="sidebar">
-
 							<div class="widget social-widget">
 								<h2>Social</h2>
 								<ul class="social-list">
@@ -566,8 +559,6 @@ require "header.php";
 									<?php } ?>
 								</ul>
 							</div>
-
-
 						</div>
 					</div>
 				</div>

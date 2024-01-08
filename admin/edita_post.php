@@ -8,10 +8,10 @@ $updatepost = new Post();
 
 if (isset($_POST['update'])) {
     $postid       = $_GET['id'];
-    $titulo       = utf8_decode($_POST['titulo']);
-    $categoria    = $_POST['categoria'];
-    $slug         = $_POST['slug'];
-    $autor        = utf8_decode($_POST['autor']);
+    $titulo = $_POST['titulo'];
+    $categoria = $_POST['categoria'];
+    $slug = $_POST['slug'];
+    $autor = $_POST['autor'];
     $data_post    = $_POST['data_post'];
     $conteudo     = $_POST['conteudo'];
     $imagem       = '';
@@ -34,6 +34,9 @@ if (isset($_POST['update'])) {
         }
     }
 
+       // Converta o título para UTF-8
+       $titulo = iconv("ISO-8859-1", "UTF-8", $titulo);
+       
     $sql = $updatepost->update($titulo, $autor, $categoria, $data_post, $imagem, $conteudo, $slug, $destaque, $postid);
 
     if ($sql) {

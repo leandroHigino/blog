@@ -44,7 +44,7 @@ require_once "header.php";
                         ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
-                                <td><?php echo utf8_encode($row['titulo']); ?></td>
+                                <td><?php echo htmlspecialchars(substr($row['titulo'], 0, 45)) . '...'; ?></td>
                                 <td><?php echo $row['autor']; ?></td>
                                 <td><?php echo $row['categoria']; ?></td>
                                 <td>
@@ -55,7 +55,7 @@ require_once "header.php";
                                     ?>
                                 </td>
                                 <td><img src="<?php echo $row['imagem']; ?>" width="75" height="auto" /></td>
-                                <td><?php echo substr($row['conteudo'], 0, 45) . '...'; ?></td>
+                                <td><?php echo htmlspecialchars(substr($row['conteudo'], 0, 45)) . '...'; ?></td>
                                 <td><?php echo $destaque; ?></td>
                                 <td class="text-center">
                                     <a href="edita_post?id=<?php echo $row['id']; ?>" class="btn btn-warning"><i class="fas fa-edit"></i></a>
