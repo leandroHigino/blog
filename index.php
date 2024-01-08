@@ -1,7 +1,6 @@
 <?php 
 	require_once "admin/functions/db_connect.php";
 	require_once "admin/functions/functions.php";
-
 	require_once "header.php";
 ?>
 
@@ -24,29 +23,29 @@
 							<div class="owl-wrapper">
 							
 								<div class="owl-carousel" data-num="1">
-								<?php
-												// Consulta para obter os posts em destaque
-												$query = "SELECT * FROM posts WHERE destaque = 1 ORDER BY data_post DESC LIMIT 3";
-												$result = mysqli_query($mysqli, $query);
+									<?php
+										// Consulta para obter os posts em destaque
+										$query = "SELECT * FROM posts WHERE destaque = 1 ORDER BY data_post DESC LIMIT 3";
+										$result = mysqli_query($mysqli, $query);
 
-												while ($row = mysqli_fetch_assoc($result)) {
-													$id        = $row['id'];
-													$titulo    = $row['titulo'];
-													$autor     = $row['autor'];
-													$categoria = $row['categoria'];
-													$data_post = $row['data_post'];
-													$imagem    = $row['imagem'];
-													$conteudo  = $row['conteudo'];
-													$destaque  = $row['destaque'];
-													$slug 	= $row['slug'];
+											while ($row = mysqli_fetch_assoc($result)) {
+												$id        = $row['id'];
+												$titulo    = $row['titulo'];
+												$autor     = $row['autor'];
+												$categoria = $row['categoria'];
+												$data_post = $row['data_post'];
+												$imagem    = $row['imagem'];
+												$conteudo  = $row['conteudo'];
+												$destaque  = $row['destaque'];
+												$slug 	= $row['slug'];
 
-													// Consulta para obter o nome da categoria com base no ID
-													$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
-													$result_categoria = mysqli_query($mysqli, $query_categoria);
-													$row_categoria = mysqli_fetch_assoc($result_categoria);
-													$categoria = $row_categoria['categoria'];													
+												// Consulta para obter o nome da categoria com base no ID
+												$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
+												$result_categoria = mysqli_query($mysqli, $query_categoria);
+												$row_categoria = mysqli_fetch_assoc($result_categoria);
+												$categoria = $row_categoria['categoria'];													
 
-											?>
+									?>
 									<div class="item">
 										
 										<div class="news-post image-post">
@@ -57,7 +56,7 @@
 												<a class="category-link" href="#"><?php echo $categoria; ?></a>
 												<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
 												<ul class="post-tags">
-													<li>by <a href="#"><?php echo utf8_encode($row['autor']); ?></a></li>
+													<li>by <a href="#"><?php echo $autor; ?></a></li>
 													<li><?php 
                                                     		$data = $row['data_post'];
                                                     		$data = date("d/m/Y", strtotime($data));

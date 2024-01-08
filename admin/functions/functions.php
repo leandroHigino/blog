@@ -143,12 +143,18 @@
             }
         }
     
-        public function insert($titulo, $autor, $categoria, $data_post, $imagem, $conteudo, $slug, $destaque) {
+        public function insert(...$params) {
+            foreach ($params as &$param) {
+                if (!mb_check_encoding($param, 'UTF-8')) {
+                    $param = mb_convert_encoding($param, 'UTF-8');
+                }
+            }
+            
             $stmt = $this->dbcon->prepare("INSERT INTO posts (titulo, autor, categoria, data_post, imagem, conteudo, slug, destaque) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssssssi", $titulo, $autor, $categoria, $data_post, $imagem, $conteudo, $slug, $destaque);
+            $stmt->bind_param("sssssssi", ...$params);
             $result = $stmt->execute();
             $stmt->close();
-    
+        
             return $result;
         }
     
