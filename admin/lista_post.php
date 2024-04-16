@@ -40,7 +40,7 @@ require_once "header.php";
                         $sql = $fetchonerecord->fetchdata();
                         while ($row = mysqli_fetch_array($sql)) {
                             $destaque = $row['destaque'] ? 'Sim' : 'Não';
-                            
+
                         ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
@@ -48,18 +48,18 @@ require_once "header.php";
                                 <td><?php echo $row['autor']; ?></td>
                                 <td><?php echo $row['categoria']; ?></td>
                                 <td>
-                                    <?php 
-                                        $data = $row['data_post'];
-                                        $data = date("d/m/Y", strtotime($data));
-                                        echo $data;
+                                    <?php
+                                    $data = $row['data_post'];
+                                    $data = date("d/m/Y", strtotime($data));
+                                    echo $data;
                                     ?>
                                 </td>
-                                <td><img src="<?php echo $row['imagem']; ?>" width="75" height="auto" /></td>
+                                <td><img src="<?php echo $row['imagem']; ?>" width="50" height="auto" /></td>
                                 <td><?php echo htmlspecialchars(substr(strip_tags($row['conteudo']), 0, 45)) . '...'; ?></td>
                                 <td><?php echo $destaque; ?></td>
                                 <td class="text-center">
-                                    <a href="edita_post?id=<?php echo $row['id']; ?>" class="btn btn-warning"><i class="fas fa-edit"></i></a>
-                                    <a href="delete_post?del=<?php echo $row['id']; ?>" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                                    <a href="edita_post?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
+                                    <a href="delete_post?del=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
                                 </td>
                             </tr>
                         <?php } ?>
