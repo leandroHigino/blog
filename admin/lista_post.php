@@ -7,9 +7,9 @@ $fetchonerecord = new Post();
 require_once "header.php";
 ?>
 <!-- Sidebar -->
-<?php require_once("sidebar.php"); ?>
+<?php require_once "sidebar.php"; ?>
 
-<?php require_once("topbar.php"); ?>
+<?php require_once "topbar.php"; ?>
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
@@ -41,12 +41,16 @@ require_once "header.php";
                         while ($row = mysqli_fetch_array($sql)) {
                             $destaque = $row['destaque'] ? 'Sim' : 'Não';
 
+                            // Buscar o nome da categoria com base no ID
+                            $categoria_id = $row['categoria'];
+                            $categoria_nome = $fetchonerecord->getCategoryName($categoria_id);
+
                         ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
                                 <td><?php echo htmlspecialchars(substr($row['titulo'], 0, 45)) . '...'; ?></td>
                                 <td><?php echo $row['autor']; ?></td>
-                                <td><?php echo $row['categoria']; ?></td>
+                                <td><?php echo $categoria_nome; ?></td>
                                 <td>
                                     <?php
                                     $data = $row['data_post'];

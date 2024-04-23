@@ -194,6 +194,17 @@ class Post
         return $result;
     }
 
+    public function getCategoryName($categoriaid)
+    {
+        $stmt = $this->dbcon->prepare("SELECT categoria FROM categorias WHERE id = ?");
+        $stmt->bind_param("i", $categoriaid);
+        $stmt->execute();
+        $stmt->bind_result($categoria_nome);
+        $stmt->fetch();
+        $stmt->close();
+        return $categoria_nome;
+    }
+
     public function update($titulo, $autor, $categoria, $data_post, $imagem, $conteudo, $slug, $destaque, $postid)
     {
         // Obter a imagem atual do post antes de executar a atualização

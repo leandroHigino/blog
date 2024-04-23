@@ -1,9 +1,15 @@
 RewriteEngine On
 
 # Reescrever URLs para posts no formato "blog/slug"
-RewriteRule ^blog/([^/]+)/?$ blog/single-post.php?slug=$1 [L]
+RewriteRule ^blog/([^/]+)/?$ blog/single-post.php?slug=$1 [QSA,L]
+
+# Redirecionar URLs com parâmetro de ID para usar slug (opcional)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{QUERY_STRING} id=([^&]+)
+RewriteRule ^blog/post$ /blog/%1? [R=301,L]
 
 # Restante das regras existentes
 RewriteCond %{SCRIPT_FILENAME} !-f
 RewriteCond %{SCRIPT_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?url=$1 [L]
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]

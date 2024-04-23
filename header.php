@@ -1,17 +1,18 @@
-<?php 
-    require_once "admin/functions/db_connect.php";
-    require_once "admin/functions/functions.php";
+<?php
+require_once "admin/functions/db_connect.php";
+require_once "admin/functions/functions.php";
 
-    // Criar uma instância da classe CategoriasManager
-    $categoriasManager = new CategoriasManager();
+// Criar uma instância da classe CategoriasManager
+$categoriasManager = new CategoriasManager();
 
-    // Obter as categorias do banco de dados
-    $categorias = $categoriasManager->fetchCategorias();
+// Obter as categorias do banco de dados
+$categorias = $categoriasManager->fetchCategorias();
 
 ?>
 
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="pt-br" class="no-js">
+
 <head>
     <title>NewSport's</title>
     <meta charset="utf-8">
@@ -21,6 +22,7 @@
     <link rel="stylesheet" href="css/mite-assets.min.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
+
 <body>
     <!-- Container -->
     <div id="container">
@@ -37,15 +39,18 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul class="navbar-nav m-auto">
                             <li><a href="home">Home</a></li>
-                        <?php 
-                            foreach ($categorias as $categoria) { ?>
-                        <li><a href="categoria.php?id=<?php echo $categoria['id']; ?>"><?php echo $categoria['categoria']; ?></a></li>
-                        <?php } ?>
+                            <?php
+                            foreach ($categorias as $categoria) {
+                                $nomeCategoria = urlencode($categoria['categoria']); // Codifica o nome da categoria para usar na URL
+                            ?>
+                                <li><a href="categoria.php?nome=<?php echo $nomeCategoria; ?>"><?php echo $categoria['categoria']; ?></a></li>
+                            <?php } ?>
+
                         </ul>
                     </div>
                     <a class="search-button" href="#"><i class="fa fa-search"></i></a>
                     <form class="form-search">
-                        <input type="search" placeholder="Buscar:"/>
+                        <input type="search" placeholder="Buscar:" />
                     </form>
                 </div>
             </nav>

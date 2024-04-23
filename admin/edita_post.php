@@ -17,13 +17,21 @@ if (isset($_POST['update'])) {
     $conteudo = $_POST['conteudo'];
     $destaque = isset($_POST['destaque']) ? 1 : 0;
 
-    // Obter o post atual para verificar a imagem atual
+    // Obter o post atual para recuperar o caminho da imagem atual
     $post = $updatepost->fetchonerecord($postid);
-    $row = mysqli_fetch_array($post);
-    $imagem_atual = $row['imagem']; // Caminho da imagem atual
+    if ($post && $post->num_rows > 0) {
+        $row = $post->fetch_assoc();
+        $imagem_atual = $row['imagem']; // Caminho da imagem atual do post
+    } else {
+        // Lidar com o caso em que o post não é encontrado
+        echo "<script>alert('Post não encontrado!');</script>";
+        echo "<script>window.location.href='edita_post?id=$postid'</script>";
+        exit; // Encerrar o script após redirecionar
+    }
 
     // Verificar se uma nova imagem foi enviada
     if (!empty($_FILES["imagem"]["name"])) {
+        // Novo arquivo de imagem selecionado
         $imagem_path = "uploads/" . basename($_FILES["imagem"]["name"]);
 
         // Validar o tipo de arquivo
@@ -31,7 +39,8 @@ if (isset($_POST['update'])) {
         if ($check !== false) {
             // Mover o arquivo para o diretório de uploads
             if (move_uploaded_file($_FILES["imagem"]["tmp_name"], $imagem_path)) {
-                $imagem_atual = $imagem_path; // Usar o caminho da nova imagem
+                // Usar o caminho da nova imagem
+                $imagem_atual = $imagem_path;
                 echo "<script>alert('Imagem enviada com sucesso!');</script>";
             } else {
                 echo "<script>alert('Erro ao enviar a imagem!');</script>";
@@ -53,6 +62,11 @@ if (isset($_POST['update'])) {
     }
 }
 
+// Carregar dados do post para edição
+$postid = $_GET['id'];
+$post = $updatepost->fetchonerecord($postid);
+
+// Incluir cabeçalho, barra lateral e barra superior
 require_once "header.php";
 require_once "sidebar.php";
 require_once "topbar.php";
@@ -67,8 +81,7 @@ require_once "topbar.php";
     <div class="card shadow mb-4">
         <div class="card-body">
             <?php
-            $postid = $_GET['id'];
-            $post = $updatepost->fetchonerecord($postid);
+            // Exibir formulário para edição do post
             while ($row = mysqli_fetch_array($post)) {
             ?>
                 <form method="post" enctype="multipart/form-data">
@@ -97,14 +110,10 @@ require_once "topbar.php";
                                 <label for="categoria">Categoria</label>
                                 <select class="form-control" id="categoria" name="categoria">
                                     <?php
+                                    // Carregar opções de categorias
                                     $categorias = $fetchonerecord->fetchdata("categoria");
                                     foreach ($categorias as $categoria) {
-                                        $selected = '';
-                                        if (($categoria['id'] == $row['categoria'] && is_numeric($row['categoria'])) ||
-                                            ($categoria['categoria'] == $row['categoria'] && !is_numeric($row['categoria']))
-                                        ) {
-                                            $selected = 'selected';
-                                        }
+                                        $selected = ($categoria['id'] == $row['categoria']) ? 'selected' : '';
                                         echo "<option value='" . $categoria['id'] . "' $selected>" . $categoria['categoria'] . "</option>";
                                     }
                                     ?>
@@ -140,7 +149,7 @@ require_once "topbar.php";
                         </div>
                         <div class="col-lg-2">
                             <div class="form-group">
-                                <label for="imagem">Imagem</label><br>
+                                <label for="imagem">Imagem Atual</label><br>
                                 <img src="<?php echo $row['imagem']; ?>" width="100%" height="auto" />
                             </div>
                         </div>

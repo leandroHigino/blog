@@ -37,7 +37,7 @@ require_once "header.php";
 								$imagem    = $row['imagem'];
 								$conteudo  = $row['conteudo'];
 								$destaque  = $row['destaque'];
-								$slug 	= $row['slug'];
+								$slug 	   = $row['slug'];
 
 								// Consulta para obter o nome da categoria com base no ID
 								$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
@@ -54,7 +54,7 @@ require_once "header.php";
 
 										<div class="hover-post overlay-bg">
 											<a class="category-link" href="#"><?php echo $categoria; ?></a>
-											<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
+											<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
 											<ul class="post-tags">
 												<li>by <a href="#"><?php echo $autor; ?></a></li>
 												<li><?php
@@ -225,6 +225,7 @@ require_once "header.php";
 
 				<div class="col-lg-3 col-md-6">
 					<div class="news-post image-post">
+						<span>Publicidade</span>
 						<img src="upload/blog/sa1.jpg" alt="" style="width:100%;height: 540px;object-fit: cover;">
 					</div>
 				</div>
@@ -254,7 +255,8 @@ require_once "header.php";
 				$query = "SELECT * FROM posts ORDER BY data_post DESC";
 				$result = mysqli_query($mysqli, $query);
 
-				$result = mysqli_query($mysqli, $query);
+				// Variável para rastrear se o último post foi destacado
+				$ultimoPostDestacado = false;
 
 				while ($row = mysqli_fetch_assoc($result)) {
 					$id        = $row['id'];
@@ -265,12 +267,25 @@ require_once "header.php";
 					$imagem    = $row['imagem'];
 					$conteudo  = $row['conteudo'];
 					$destaque  = $row['destaque'];
+					$slug      = $row['slug'];
 
 					// Consulta para obter o nome da categoria com base no ID
 					$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
 					$result_categoria = mysqli_query($mysqli, $query_categoria);
 					$row_categoria = mysqli_fetch_assoc($result_categoria);
-					$categoria = $row_categoria['categoria'];
+					$categoria_nome = $row_categoria['categoria'];
+
+					// Verifica se este é o último post (última iteração do loop)
+					$ultimoPost = mysqli_num_rows($result) - 1;
+					$indicePostAtual = mysqli_num_rows($result) - 1;
+
+					if ($indicePostAtual == $ultimoPost && !$ultimoPostDestacado) {
+						// Este é o último post e ainda não foi destacado
+						$ultimoPostDestacado = true;
+						$isLastPost = true;
+					} else {
+						$isLastPost = false;
+					}
 				?>
 
 					<div class="item">
@@ -279,19 +294,22 @@ require_once "header.php";
 								<?php $uploadsPath = realpath("../admin/uploads/"); ?>
 								<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:180px;object-fit: cover;">
 							</div>
-							<a class="category-link" style="color:white;"><?php echo $categoria; ?></a>
-							<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
+							<a class="category-link" style="color:white;"><?php echo $categoria_nome; ?></a>
+							<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
 							<ul class="post-tags">
 								<li>
 									<?php
 									$data_inicial = new DateTime($data_post);
 									$data_atual = new DateTime(); // Data atual
 									$intervalo = $data_inicial->diff($data_atual);
-									echo $intervalo->format('Publicado à %a dias'); // Mostra a diferença em dias
+									echo $intervalo->format('Publicado há %a dias'); // Mostra a diferença em dias
 									?>
 								</li>
-								<li>by <a href="#"><?php echo $autor; ?></a></li>
+								<li>por <a href="#"><?php echo $autor; ?></a></li>
 							</ul>
+							<?php if ($isLastPost) { ?>
+								<span class="destaque-label">Último Post</span>
+							<?php } ?>
 						</div>
 					</div>
 
@@ -302,6 +320,7 @@ require_once "header.php";
 		<div class="border-bottom"></div>
 	</div>
 </section>
+
 <!-- End fresh section -->
 
 
@@ -316,187 +335,64 @@ require_once "header.php";
 						<h1>Últimos Posts</h1>
 					</div>
 					<div class="iso-call">
-						<div class="item">
-							<?php
-							// Trazer o post mais recente da categoria futebol
-							$query = "SELECT * FROM posts WHERE categoria = 1 ORDER BY data_post DESC LIMIT 1";
-							$result = mysqli_query($mysqli, $query);
 
-							while ($row = mysqli_fetch_assoc($result)) {
-								$id        = $row['id'];
-								$titulo    = $row['titulo'];
-								$autor     = $row['autor'];
-								$categoria = $row['categoria'];
-								$data_post = $row['data_post'];
-								$imagem    = $row['imagem'];
-								$conteudo  = $row['conteudo'];
-								$destaque  = $row['destaque'];
+						<?php
+						// Consulta para obter as últimas postagens de cada categoria
+						$query_categorias = "SELECT id, categoria FROM categorias";
+						$result_categorias = mysqli_query($mysqli, $query_categorias);
 
-								// Consulta para obter o nome da categoria com base no ID
-								$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
-								$result_categoria = mysqli_query($mysqli, $query_categoria);
-								$row_categoria = mysqli_fetch_assoc($result_categoria);
-								$categoria = $row_categoria['categoria'];
+						// Loop através de cada categoria
+						while ($row_categoria = mysqli_fetch_assoc($result_categorias)) {
+							$categoria_id = $row_categoria['id'];
+							$categoria_nome = $row_categoria['categoria'];
 
+							// Consulta para obter o último post da categoria atual
+							$query_ultimo_post = "SELECT * FROM posts WHERE categoria = $categoria_id ORDER BY data_post DESC LIMIT 1";
+							$result_ultimo_post = mysqli_query($mysqli, $query_ultimo_post);
+							$row_ultimo_post = mysqli_fetch_assoc($result_ultimo_post);
 
-							?>
-								<div class="news-post article-post">
-									<div class="image-holder">
-										<?php $uploadsPath = realpath("../admin/uploads/"); ?>
-										<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
+							if ($row_ultimo_post) {
+								// Dados do último post encontrado nesta categoria
+								$id = $row_ultimo_post['id'];
+								$titulo = $row_ultimo_post['titulo'];
+								$autor = $row_ultimo_post['autor'];
+								$data_post = $row_ultimo_post['data_post'];
+								$imagem = $row_ultimo_post['imagem'];
+								$conteudo = $row_ultimo_post['conteudo'];
+								$slug = $row_ultimo_post['slug'];
+
+								// Formatar a data de publicação
+								$data_inicial = new DateTime($data_post);
+								$data_atual = new DateTime(); // Data atual
+								$intervalo = $data_inicial->diff($data_atual);
+								$dias_passados = $intervalo->days;
+						?>
+
+								<div class="item">
+									<div class="news-post article-post">
+										<div class="image-holder">
+											<?php $uploadsPath = realpath("../admin/uploads/"); ?>
+											<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
+										</div>
+										<a class="text-link" href="#"><?php echo $categoria_nome; ?></a>
+										<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
+										<ul class="post-tags">
+											<li>Publicado há <?php echo $dias_passados; ?> dias</li>
+											<li>by <a href="#"><?php echo $autor; ?></a></li>
+										</ul>
+										<p><?php echo substr($conteudo, 0, 100); ?></p>
 									</div>
-									<a class="text-link" href="#"><?php echo $categoria; ?></a>
-									<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
-									<ul class="post-tags">
-										<li><?php
-											$data_inicial = new DateTime($data_post);
-											$data_atual = new DateTime(); // Data atual
-											$intervalo = $data_inicial->diff($data_atual);
-											echo $intervalo->format('Publicado à %a dias'); // Mostra a diferença em dias
-											?>
-										</li>
-										<li>by <a href="#"><?php echo $autor; ?></a></li>
-									</ul>
-									<p><?php echo substr($row['conteudo'], 0, 45); ?></p>
 								</div>
-							<?php } ?>
-						</div>
-						<div class="item">
-							<?php
-							// Trazer o post mais recente da categoria nba
-							$query = "SELECT * FROM posts WHERE categoria = 2 ORDER BY data_post DESC LIMIT 1";
-							$result = mysqli_query($mysqli, $query);
 
-							while ($row = mysqli_fetch_assoc($result)) {
-								$id        = $row['id'];
-								$titulo    = $row['titulo'];
-								$autor     = $row['autor'];
-								$categoria = $row['categoria'];
-								$data_post = $row['data_post'];
-								$imagem    = $row['imagem'];
-								$conteudo  = $row['conteudo'];
-								$destaque  = $row['destaque'];
+						<?php
+							} // Fim do if ($row_ultimo_post)
+						} // Fim do while ($row_categoria = mysqli_fetch_assoc($result_categorias))
+						?>
 
-								// Consulta para obter o nome da categoria com base no ID
-								$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
-								$result_categoria = mysqli_query($mysqli, $query_categoria);
-								$row_categoria = mysqli_fetch_assoc($result_categoria);
-								$categoria = $row_categoria['categoria'];
-
-
-							?>
-								<div class="news-post article-post">
-									<div class="image-holder">
-										<?php $uploadsPath = realpath("../admin/uploads/"); ?>
-										<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
-									</div>
-									<a class="text-link" href="#"><?php echo $categoria; ?></a>
-									<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
-									<ul class="post-tags">
-										<li><?php
-											$data_inicial = new DateTime($data_post);
-											$data_atual = new DateTime(); // Data atual
-											$intervalo = $data_inicial->diff($data_atual);
-											echo $intervalo->format('Publicado à %a dias'); // Mostra a diferença em dias
-											?>
-										</li>
-										<li>by <a href="#"><?php echo $autor; ?></a></li>
-									</ul>
-									<p><?php echo substr($row['conteudo'], 0, 45); ?></p>
-								</div>
-							<?php } ?>
-						</div>
-						<div class="item">
-							<?php
-							// Trazer o post mais recente da categoria F1
-							$query = "SELECT * FROM posts WHERE categoria = 3 ORDER BY data_post DESC LIMIT 1";
-							$result = mysqli_query($mysqli, $query);
-
-							while ($row = mysqli_fetch_assoc($result)) {
-								$id        = $row['id'];
-								$titulo    = $row['titulo'];
-								$autor     = $row['autor'];
-								$categoria = $row['categoria'];
-								$data_post = $row['data_post'];
-								$imagem    = $row['imagem'];
-								$conteudo  = $row['conteudo'];
-								$destaque  = $row['destaque'];
-
-								// Consulta para obter o nome da categoria com base no ID
-								$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
-								$result_categoria = mysqli_query($mysqli, $query_categoria);
-								$row_categoria = mysqli_fetch_assoc($result_categoria);
-								$categoria = $row_categoria['categoria'];
-
-
-							?>
-								<div class="news-post article-post">
-									<div class="image-holder">
-										<?php $uploadsPath = realpath("../admin/uploads/"); ?>
-										<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
-									</div>
-									<a class="text-link" href="#"><?php echo $categoria; ?></a>
-									<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
-									<ul class="post-tags">
-										<li><?php
-											$data_inicial = new DateTime($data_post);
-											$data_atual = new DateTime(); // Data atual
-											$intervalo = $data_inicial->diff($data_atual);
-											echo $intervalo->format('Publicado à %a dias'); // Mostra a diferença em dias
-											?>
-										</li>
-										<li>by <a href="#"><?php echo $autor; ?></a></li>
-									</ul>
-									<p><?php echo substr($row['conteudo'], 0, 45); ?></p>
-								</div>
-							<?php } ?>
-						</div>
-						<div class="item">
-							<?php
-							// Trazer o post mais recente da categoria skate
-							$query = "SELECT * FROM posts WHERE categoria = 4 ORDER BY data_post DESC LIMIT 1";
-							$result = mysqli_query($mysqli, $query);
-
-							while ($row = mysqli_fetch_assoc($result)) {
-								$id        = $row['id'];
-								$titulo    = $row['titulo'];
-								$autor     = $row['autor'];
-								$categoria = $row['categoria'];
-								$data_post = $row['data_post'];
-								$imagem    = $row['imagem'];
-								$conteudo  = $row['conteudo'];
-								$destaque  = $row['destaque'];
-
-								// Consulta para obter o nome da categoria com base no ID
-								$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
-								$result_categoria = mysqli_query($mysqli, $query_categoria);
-								$row_categoria = mysqli_fetch_assoc($result_categoria);
-								$categoria = $row_categoria['categoria'];
-							?>
-								<div class="news-post article-post">
-									<div class="image-holder">
-										<?php $uploadsPath = realpath("../admin/uploads/"); ?>
-										<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
-									</div>
-									<a class="text-link" href="#"><?php echo $categoria; ?></a>
-									<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
-									<ul class="post-tags">
-										<li><?php
-											$data_inicial = new DateTime($data_post);
-											$data_atual = new DateTime(); // Data atual
-											$intervalo = $data_inicial->diff($data_atual);
-											echo $intervalo->format('Publicado à %a dias'); // Mostra a diferença em dias
-											?>
-										</li>
-										<li>by <a href="#"><?php echo $autor; ?></a></li>
-									</ul>
-									<p><?php echo substr($row['conteudo'], 0, 100); ?></p>
-								</div>
-							<?php } ?>
-						</div>
 					</div>
 				</div>
 			</div>
+
 			<div class="col-lg-4">
 				<div class="sidebar">
 					<div class="widget social-widget">
@@ -543,7 +439,7 @@ require_once "header.php";
 							?>
 								<li>
 									<a class="text-link" href="#"><?php echo $categoria; ?></a>
-									<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
+									<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
 									<ul class="post-tags">
 										<li>
 											<?php
