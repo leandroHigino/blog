@@ -32,7 +32,10 @@ if (isset($_POST['update'])) {
     // Verificar se uma nova imagem foi enviada
     if (!empty($_FILES["imagem"]["name"])) {
         // Novo arquivo de imagem selecionado
-        $imagem_path = "uploads/" . basename($_FILES["imagem"]["name"]);
+        $imagem_name = $_FILES["imagem"]["name"];
+        $imagem_name = str_replace(' ', '_', $imagem_name); // Substituir espaços por underscores
+
+        $imagem_path = "uploads/" . basename($imagem_name);
 
         // Validar o tipo de arquivo
         $check = getimagesize($_FILES["imagem"]["tmp_name"]);
