@@ -43,7 +43,7 @@ $categorias = $categoriasManager->fetchCategorias();
                             foreach ($categorias as $categoria) {
                                 $nomeCategoria = urlencode($categoria['categoria']); // Codifica o nome da categoria para usar na URL
                             ?>
-                                <li><a href="categoria.php?nome=<?php echo $nomeCategoria; ?>"><?php echo $categoria['categoria']; ?></a></li>
+                                <li><a href="categoria.php?categoria=<?php echo $nomeCategoria; ?>"><?php echo $categoria['categoria']; ?></a></li>
                             <?php } ?>
 
                         </ul>

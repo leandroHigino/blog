@@ -307,9 +307,6 @@ require_once "header.php";
 								</li>
 								<li>por <a href="#"><?php echo $autor; ?></a></li>
 							</ul>
-							<?php if ($isLastPost) { ?>
-								<span class="destaque-label">Último Post</span>
-							<?php } ?>
 						</div>
 					</div>
 

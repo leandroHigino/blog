@@ -48,7 +48,7 @@ require_once "header.php";
                         ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
-                                <td><?php echo htmlspecialchars(substr($row['titulo'], 0, 45)) . '...'; ?></td>
+                                <td><?php echo htmlspecialchars(substr($row['titulo'], 0, 25)) . '...'; ?></td>
                                 <td><?php echo $row['autor']; ?></td>
                                 <td><?php echo $categoria_nome; ?></td>
                                 <td>
@@ -59,9 +59,9 @@ require_once "header.php";
                                     ?>
                                 </td>
                                 <td><img src="<?php echo $row['imagem']; ?>" width="50" height="auto" /></td>
-                                <td><?php echo htmlspecialchars(substr(strip_tags($row['conteudo']), 0, 45)) . '...'; ?></td>
+                                <td><?php echo htmlspecialchars(substr(strip_tags($row['conteudo']), 0, 25)) . '...'; ?></td>
                                 <td><?php echo $destaque; ?></td>
-                                <td class="text-center">
+                                <td>
                                     <a href="edita_post?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
                                     <a href="delete_post?del=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
                                 </td>

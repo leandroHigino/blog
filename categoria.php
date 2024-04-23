@@ -8,7 +8,7 @@ require "header.php";
 $postsPorPagina = 6;
 
 // Obtém o nome da categoria da URL
-$nomeCategoria = $_GET['nome'];
+$nomeCategoria = $_GET['categoria'];
 
 // Consulta para obter o ID da categoria
 $sqlCategoria = "SELECT id FROM categorias WHERE categoria = '$nomeCategoria'";
