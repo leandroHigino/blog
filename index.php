@@ -90,6 +90,7 @@ require_once "header.php";
 								$titulo    = $row['titulo'];
 								$categoria = $row['categoria'];
 								$data_post = $row['data_post'];
+								$slug      = $row['slug'];
 
 								// Consulta para obter o nome da categoria com base no ID
 								$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
@@ -99,7 +100,7 @@ require_once "header.php";
 
 							?>
 								<a class="text-link" href="#"><?php echo $categoria; ?></a>
-								<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
+								<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
 								<ul class="post-tags">
 									<li>
 										<?php
@@ -127,6 +128,7 @@ require_once "header.php";
 								$titulo    = $row['titulo'];
 								$categoria = $row['categoria'];
 								$data_post = $row['data_post'];
+								$slug      = $row['slug'];
 
 								// Consulta para obter o nome da categoria com base no ID
 								$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
@@ -137,7 +139,7 @@ require_once "header.php";
 
 							?>
 								<a class="text-link" href="#"><?php echo $categoria; ?></a>
-								<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
+								<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
 								<ul class="post-tags">
 									<li>
 										<?php
@@ -162,6 +164,7 @@ require_once "header.php";
 								$titulo    = $row['titulo'];
 								$categoria = $row['categoria'];
 								$data_post = $row['data_post'];
+								$slug      = $row['slug'];
 
 								// Consulta para obter o nome da categoria com base no ID
 								$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
@@ -172,7 +175,7 @@ require_once "header.php";
 
 							?>
 								<a class="text-link" href="#"><?php echo $categoria; ?></a>
-								<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
+								<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
 								<ul class="post-tags">
 									<li>
 										<?php
@@ -197,6 +200,7 @@ require_once "header.php";
 								$titulo    = $row['titulo'];
 								$categoria = $row['categoria'];
 								$data_post = $row['data_post'];
+								$slug      = $row['slug'];
 
 								// Consulta para obter o nome da categoria com base no ID
 								$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
@@ -207,7 +211,7 @@ require_once "header.php";
 
 							?>
 								<a class="text-link" href="#"><?php echo $categoria; ?></a>
-								<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
+								<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
 								<ul class="post-tags">
 									<li>
 										<?php
@@ -357,6 +361,18 @@ require_once "header.php";
 								$imagem = $row_ultimo_post['imagem'];
 								$conteudo = $row_ultimo_post['conteudo'];
 								$slug = $row_ultimo_post['slug'];
+
+								// Verifica se este é o último post (última iteração do loop)
+								$ultimoPost = mysqli_num_rows($result) - 1;
+								$indicePostAtual = mysqli_num_rows($result) - 1;
+
+								if ($indicePostAtual == $ultimoPost && !$ultimoPostDestacado) {
+									// Este é o último post e ainda não foi destacado
+									$ultimoPostDestacado = true;
+									$isLastPost = true;
+								} else {
+									$isLastPost = false;
+								}
 
 								// Formatar a data de publicação
 								$data_inicial = new DateTime($data_post);

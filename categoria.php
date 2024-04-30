@@ -51,6 +51,8 @@ $resultadoPosts = mysqli_query($mysqli, $sqlPosts);
 		<div class="blog-box grid-style text-center">
 			<div class="row">
 				<?php
+				$count = 0; // Inicializa o contador de colunas
+
 				while ($row = mysqli_fetch_array($resultadoPosts)) {
 					$id = $row['id'];
 					$titulo = $row['titulo'];
@@ -58,7 +60,14 @@ $resultadoPosts = mysqli_query($mysqli, $sqlPosts);
 					$autor = $row['autor'];
 					$conteudo = $row['conteudo'];
 					$data_post = $row['data_post'];
+					$slug = $row['slug'];
+
+					// Verifica se é o início de uma nova linha
+					if ($count % 3 == 0) {
+						echo '<div class="row">'; // Abre uma nova linha a cada 3 colunas
+					}
 				?>
+
 					<div class="col-lg-4 col-md-6">
 						<div class="news-post article-post">
 							<div class="image-holder">
@@ -66,7 +75,7 @@ $resultadoPosts = mysqli_query($mysqli, $sqlPosts);
 								<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
 							</div>
 							<a class="text-link" href="#"><?php echo $nomeCategoria; ?></a>
-							<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
+							<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
 							<ul class="post-tags">
 								<li>
 									<?php
@@ -77,12 +86,21 @@ $resultadoPosts = mysqli_query($mysqli, $sqlPosts);
 									?>
 								</li>
 								<li>by <a href="#"><?php echo $autor; ?></a></li>
-								<p><?php echo substr($conteudo, 0, 100) . '...'; ?></p>
 							</ul>
+							<p><?php echo substr($conteudo, 0, 100) . '...'; ?></p>
 						</div>
 					</div>
-				<?php } ?>
+
+				<?php
+					// Verifica se é o fim de uma linha
+					if ($count % 3 == 2 || $count == mysqli_num_rows($resultadoPosts) - 1) {
+						echo '</div>'; // Fecha a linha após a terceira coluna ou no último post
+					}
+					$count++; // Incrementa o contador de colunas
+				}
+				?>
 			</div>
+
 			<!-- Pagination -->
 			<div class="pagination-box">
 				<ul class="pagination-list">
