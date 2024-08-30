@@ -69,20 +69,17 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 
             <form method="post" enctype="multipart/form-data">
                 <div class="row">
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="form-group">
                             <label for="imagem">Nova Imagem</label>
                             <input type="file" class="form-control-file" id="imagem" name="imagem" accept="image/*">
                             <small class="form-text text-muted">Deixe em branco se não deseja alterar a imagem.</small>
+                            <br>
+                            <img src="<?php echo htmlspecialchars($row['imagem']); ?>" width="120" height="270" alt="Imagem Atual" />
                         </div>
                     </div>
 
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="imagem">Imagem Atual</label>
-                            <img src="<?php echo htmlspecialchars($row['imagem']); ?>" width="100%" height="auto" alt="Imagem Atual" />
-                        </div>
-                    </div>
+
                 </div>
                 <br>
 
