@@ -52,7 +52,7 @@
         </div>
     </li>
 
-    <!-- Nav Item - Posts Collapse Menu -->
+    <!-- Nav Item - Categorias Collapse Menu -->
     <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCategory" aria-expanded="true" aria-controls="collapseCategory">
             <i class="fas fa-fw fa-tags"></i>
@@ -62,6 +62,20 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item" href="lista_categoria">Lista Categorias</a>
                 <a class="collapse-item" href="cadastro_categoria">Cadastro Categorias</a>
+            </div>
+        </div>
+    </li>
+
+    <!-- Nav Item - Publicidade Collapse Menu -->
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePublicidade" aria-expanded="true" aria-controls="collapsePublicidade">
+            <i class="fas fa-fw fa-tags"></i>
+            <span>Publicidade</span>
+        </a>
+        <div id="collapsePublicidade" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item" href="lista_publicidade">Lista Publicidades</a>
+                <a class="collapse-item" href="cadastro_publicidade">Cadastro Publicidades</a>
             </div>
         </div>
     </li>

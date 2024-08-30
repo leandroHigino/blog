@@ -51,7 +51,12 @@ if (isset($_POST['update'])) {
         } else {
             echo "<script>alert('O arquivo selecionado não é uma imagem válida!');</script>";
         }
+    } else {
+        // Usar a imagem atual se não houver uma nova imagem
+        $post_data = $post->fetch_assoc(); // Recuperar os dados do post
+        $imagem_atual = $post_data['imagem']; // Usar a imagem atual
     }
+
 
     // Atualizar o post no banco de dados
     $sql = $updatepost->update($titulo, $autor, $categoria, $data_post, $imagem_atual, $conteudo, $slug, $destaque, $postid);
@@ -162,7 +167,7 @@ require_once "topbar.php";
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label for="conteudo">Conteúdo</label>
-                                <textarea class="form-control form-control-user" id="conteudo" name="conteudo" row="5" value="<?php echo $row['conteudo']; ?>"><?php echo $row['conteudo']; ?></textarea>
+                                <textarea class="form-control form-control-user" id="conteudo" name="conteudo" row="5"><?php echo $row['conteudo']; ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -190,11 +195,15 @@ require_once "topbar.php";
             .normalize('NFD') // Normaliza os caracteres acentuados
             .replace(/[\u0300-\u036f]/g, '') // Remove os diacríticos
             .replace(/\s+/g, '-') // Substitui espaços em branco por hífens
-            .replace(/[^\w\-]+/g, '') // Remove caracteres não alfanuméricos
+            .replace(/[^\w\-]+/g, '') // Remove caracteres especiais
             .replace(/\-\-+/g, '-') // Substitui múltiplos hífens por um único hífen
-            .replace(/^-+/, '') // Remove hífens no início
-            .replace(/-+$/, ''); // Remove hífens no final
+            .replace(/^-+/, '') // Remove hífens do início
+            .replace(/-+$/, ''); // Remove hífens do final
         return slug;
     }
 </script>
-<?php require_once "footer.php"; ?>
+
+<?php
+// Incluir rodapé
+require_once "footer.php";
+?>

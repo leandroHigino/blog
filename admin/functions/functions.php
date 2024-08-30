@@ -270,6 +270,16 @@ class Post
 
         return $row['slug'];
     }
+
+    public function updateWithoutImage($titulo, $autor, $categoria, $data_post, $conteudo, $slug, $destaque, $postid)
+    {
+        $stmt = $this->dbcon->prepare("UPDATE posts SET titulo = ?, autor = ?, categoria = ?, data_post = ?, conteudo = ?, slug = ?, destaque = ? WHERE id = ?");
+        $stmt->bind_param("sssssssi", $titulo, $autor, $categoria, $data_post, $conteudo, $slug, $destaque, $postid);
+        $result = $stmt->execute();
+        $stmt->close();
+
+        return $result;
+    }
 }
 
 
@@ -299,5 +309,141 @@ class CategoriasManager
         $categorias = $result->fetch_all(MYSQLI_ASSOC);
 
         return $categorias;
+    }
+}
+
+
+class Publicidade
+{
+    private $dbcon;
+
+    public function __construct()
+    {
+        $this->dbcon = new mysqli(DB_SERVER, DB_USER, DB_PASS, DB_NAME);
+
+        if ($this->dbcon->connect_error) {
+            die("Failed to connect to MySQL: " . $this->dbcon->connect_error);
+        }
+    }
+
+    public function fetchdata()
+    {
+        $result = $this->dbcon->query("SELECT * FROM publicidade");
+        return $result;
+    }
+
+    public function fetchonerecord($publicidadeid)
+    {
+        $stmt = $this->dbcon->prepare("SELECT * FROM publicidade WHERE id = ?");
+        $stmt->bind_param("i", $publicidadeid);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $stmt->close();
+
+        return $result;
+    }
+
+    // Função para redimensionar a imagem
+    private function redimensionarImagem($imagemCaminho, $largura, $altura)
+    {
+        list($larguraOriginal, $alturaOriginal) = getimagesize($imagemCaminho);
+        $novaImagem = imagecreatetruecolor($largura, $altura);
+        $imagemOrigem = imagecreatefromstring(file_get_contents($imagemCaminho));
+        imagecopyresampled($novaImagem, $imagemOrigem, 0, 0, 0, 0, $largura, $altura, $larguraOriginal, $alturaOriginal);
+        imagejpeg($novaImagem, $imagemCaminho, 100);
+        imagedestroy($novaImagem);
+        imagedestroy($imagemOrigem);
+    }
+
+    // Função para inserir a publicidade no banco de dados
+    public function insert($imagem)
+    {
+        // Defina o diretório onde a imagem será salva
+        $targetDir = "uploads/publicidade/";
+        $targetFile = $targetDir . basename($imagem["name"]);
+
+        // Verifica se o arquivo é uma imagem válida
+        $check = getimagesize($imagem["tmp_name"]);
+        if ($check !== false) {
+            if (move_uploaded_file($imagem["tmp_name"], $targetFile)) {
+                // Redimensiona a imagem para 255x540 pixels
+                $this->redimensionarImagem($targetFile, 255, 540);
+
+                // Insere o caminho da imagem no banco de dados
+                $stmt = $this->dbcon->prepare("INSERT INTO publicidade (imagem) VALUES (?)");
+                $stmt->bind_param("s", $targetFile);
+
+                if ($stmt->execute()) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+                $stmt->close();
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public function fetchAll()
+    {
+        $query = "SELECT * FROM publicidade";
+        $result = $this->dbcon->query($query);
+
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function update($id, $novaImagem = null)
+    {
+        $updateQuery = "UPDATE publicidade SET";
+        $params = [];
+        $types = '';
+
+        if ($novaImagem) {
+            $targetDir = "uploads/publicidade/";
+            $targetFile = $targetDir . basename($novaImagem["name"]);
+
+            $check = getimagesize($novaImagem["tmp_name"]);
+            if ($check !== false) {
+                if (move_uploaded_file($novaImagem["tmp_name"], $targetFile)) {
+                    $this->redimensionarImagem($targetFile, 255, 540);
+                    $updateQuery .= " imagem = ?";
+                    $params[] = $targetFile;
+                    $types .= 's';
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
+        $updateQuery .= " WHERE id = ?";
+        $params[] = $id;
+        $types .= 'i';
+
+        $stmt = $this->dbcon->prepare($updateQuery);
+        $stmt->bind_param($types, ...$params);
+
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+
+        $stmt->close();
+    }
+
+    public function delete($publicidadeid)
+    {
+        $stmt = $this->dbcon->prepare("DELETE FROM publicidade WHERE id = ?");
+        $stmt->bind_param("i", $publicidadeid);
+        $result = $stmt->execute();
+        $stmt->close();
+
+        return $result;
     }
 }

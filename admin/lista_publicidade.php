@@ -2,7 +2,7 @@
 require_once "functions/functions.php";
 require_once "functions/protect.php";
 
-$fetchdata = new Usuario();
+$fetchonerecord = new Publicidade();
 
 require_once "header.php";
 
@@ -16,7 +16,7 @@ require_once "header.php";
 <div class="container-fluid">
 
     <!-- Page Heading -->
-    <h1 class="h3 mb-4 text-gray-800">Lista de Usuários</h1>
+    <h1 class="h3 mb-4 text-gray-800">Lista de Publicidades</h1>
 
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
@@ -26,31 +26,21 @@ require_once "header.php";
                     <thead>
                         <tr>
                             <th>Id</th>
-                            <th>Nome</th>
-                            <th>E-mail</th>
-                            <th>Data de Cadastro</th>
+                            <th>Imagem</th>
                             <th class="text-center">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        $sql = $fetchdata->fetchdata();
+                        $sql = $fetchonerecord->fetchdata();
                         while ($row = mysqli_fetch_array($sql)) {
                         ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
-                                <td><?php echo $row['nome']; ?></td>
-                                <td><?php echo $row['email']; ?></td>
-                                <td>
-                                    <?php
-                                    $data = $row['data_cadastro'];
-                                    $data = date("d/m/Y", strtotime($data));
-                                    echo $data;
-                                    ?>
-                                </td>
+                                <td><img src="<?php echo $row['imagem']; ?>" width="30" height="30" /></td>
                                 <td class="text-center">
-                                    <a href="edita_usuario?id=<?php echo $row['id']; ?>" class="btn btn-warning"><i class="fas fa-edit"></i></a>
-                                    <a href="delete_usuario?del=<?php echo $row['id']; ?>" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                                    <a href="edita_publicidade?id=<?php echo $row['id']; ?>" class="btn btn-warning"><i class="fas fa-edit"></i></a>
+                                    <a href="delete_publicidade?del=<?php echo $row['id']; ?>" class="btn btn-danger"><i class="fas fa-trash"></i></a>
                                 </td>
                             </tr>
                         <?php } ?>
