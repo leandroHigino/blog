@@ -239,36 +239,55 @@ require "header.php";
 						<h2>Leia também</h2>
 						<ul class="list-posts">
 							<?php
-							// Consulta para obter todos os posts da categoria futebol
-							$query = "SELECT p.id, p.titulo, p.categoria, p.data_post, c.categoria AS categoria
-											FROM posts p
-											INNER JOIN categorias c ON p.categoria = c.id
-											WHERE c.categoria = 'futebol'
-											ORDER BY p.data_post DESC";
-							$result = mysqli_query($mysqli, $query);
+							// Consulta para obter todas as categorias
+							$result_categorias = mysqli_query($mysqli, "SELECT id, categoria FROM categorias");
 
-							while ($row = mysqli_fetch_assoc($result)) {
-								$id = $row['id'];
-								$titulo = $row['titulo'];
-								$data_post = $row['data_post'];
-								$categoria = $row['categoria'];
+							// Iterar sobre cada categoria
+							while ($row_categoria = mysqli_fetch_assoc($result_categorias)) {
+								$categoria_id = $row_categoria['id'];
+								$categoria_nome = $row_categoria['categoria'];
+
+								// Consulta para obter os 6 posts mais recentes da categoria atual
+								$stmt_posts = $mysqli->prepare("
+			SELECT id, titulo, data_post, slug
+			FROM posts
+			WHERE categoria = ?
+			ORDER BY data_post DESC
+			LIMIT 6
+		");
+								$stmt_posts->bind_param("i", $categoria_id);
+								$stmt_posts->execute();
+								$result_posts = $stmt_posts->get_result();
+
+								// Exibir posts da categoria atual
+								while ($row_post = $result_posts->fetch_assoc()) {
+									$id = $row_post['id'];
+									$titulo = $row_post['titulo'];
+									$data_post = $row_post['data_post'];
+									$slug = $row_post['slug']; // Recupera o slug corretamente
+
 							?>
-								<li>
-									<a class="text-link" href="#"><?php echo $categoria; ?></a>
-									<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
-									<ul class="post-tags">
-										<li>
-											<?php
-											$data_inicial = new DateTime($data_post);
-											$data_atual = new DateTime(); // Data atual
-											$intervalo = $data_inicial->diff($data_atual);
-											echo $intervalo->format('Publicado à %a dias'); // Mostra a diferença em dias
-											?>
-										</li>
-									</ul>
-								</li>
-							<?php } ?>
+									<li>
+										<a class="text-link" href="#"><?php echo htmlspecialchars($categoria_nome); ?></a>
+										<h2><a href="post?slug=<?php echo urlencode($slug); ?>"><?php echo htmlspecialchars($titulo); ?></a></h2>
+										<ul class="post-tags">
+											<li>
+												<?php
+												$data_inicial = new DateTime($data_post);
+												$data_atual = new DateTime();
+												$intervalo = $data_inicial->diff($data_atual);
+												echo 'Publicado há ' . $intervalo->format('%a dias');
+												?>
+											</li>
+										</ul>
+									</li>
+							<?php
+								}
+								$stmt_posts->close();
+							}
+							?>
 						</ul>
+
 					</div>
 				</div>
 			</div>

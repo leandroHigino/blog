@@ -223,6 +223,7 @@ require_once "header.php";
 <section class="blog-section">
 	<div class="container">
 		<div class="row">
+			<!-- Coluna para os posts -->
 			<div class="col-lg-8">
 				<div class="blog-box">
 					<div class="title-section">
@@ -255,21 +256,9 @@ require_once "header.php";
 								$conteudo = $row_ultimo_post['conteudo'];
 								$slug = $row_ultimo_post['slug'];
 
-								// Verifica se este é o último post (última iteração do loop)
-								$ultimoPost = mysqli_num_rows($result) - 1;
-								$indicePostAtual = mysqli_num_rows($result) - 1;
-
-								if ($indicePostAtual == $ultimoPost && !$ultimoPostDestacado) {
-									// Este é o último post e ainda não foi destacado
-									$ultimoPostDestacado = true;
-									$isLastPost = true;
-								} else {
-									$isLastPost = false;
-								}
-
-								// Formatar a data de publicação
+								// Calcular dias passados desde a publicação
 								$data_inicial = new DateTime($data_post);
-								$data_atual = new DateTime(); // Data atual
+								$data_atual = new DateTime();
 								$intervalo = $data_inicial->diff($data_atual);
 								$dias_passados = $intervalo->days;
 						?>
@@ -277,51 +266,36 @@ require_once "header.php";
 								<div class="item">
 									<div class="news-post article-post">
 										<div class="image-holder">
-											<?php $uploadsPath = realpath("../admin/uploads/"); ?>
-											<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
+											<img src="admin/<?php echo htmlspecialchars($imagem); ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
 										</div>
-										<a class="text-link" href="#"><?php echo $categoria_nome; ?></a>
-										<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
+										<a class="text-link" href="#"><?php echo htmlspecialchars($categoria_nome); ?></a>
+										<h2><a href="post?slug=<?php echo urlencode($slug); ?>"><?php echo htmlspecialchars($titulo); ?></a></h2>
 										<ul class="post-tags">
 											<li>Publicado há <?php echo $dias_passados; ?> dias</li>
-											<li>by <a href="#"><?php echo $autor; ?></a></li>
+											<li>by <a href="#"><?php echo htmlspecialchars($autor); ?></a></li>
 										</ul>
-										<p><?php echo substr($conteudo, 0, 100); ?></p>
+										<p><?php echo htmlspecialchars(substr($conteudo, 0, 100)); ?></p>
 									</div>
 								</div>
 
 						<?php
-							} // Fim do if ($row_ultimo_post)
-						} // Fim do while ($row_categoria = mysqli_fetch_assoc($result_categorias))
+							}
+						}
 						?>
 
 					</div>
 				</div>
 			</div>
 
+			<!-- Coluna da barra lateral -->
 			<div class="col-lg-4">
 				<div class="sidebar">
 					<div class="widget social-widget">
 						<h2>Social</h2>
 						<ul class="social-list">
-							<li>
-								<a href="#">
-									<i class="fa fa-facebook"></i>
-									facebook
-								</a>
-							</li>
-							<li>
-								<a href="#">
-									<i class="fa fa-twitter"></i>
-									twitter
-								</a>
-							</li>
-							<li>
-								<a href="#">
-									<i class="fa fa-instagram"></i>
-									instagram
-								</a>
-							</li>
+							<li><a href="#"><i class="fa fa-facebook"></i>facebook</a></li>
+							<li><a href="#"><i class="fa fa-twitter"></i>twitter</a></li>
+							<li><a href="#"><i class="fa fa-instagram"></i>instagram</a></li>
 						</ul>
 					</div>
 
@@ -330,8 +304,7 @@ require_once "header.php";
 						<ul class="list-posts">
 							<?php
 							// Consulta para obter todas as categorias
-							$query_categorias = "SELECT id, categoria FROM categorias";
-							$result_categorias = mysqli_query($mysqli, $query_categorias);
+							$result_categorias = mysqli_query($mysqli, "SELECT id, categoria FROM categorias");
 
 							// Iterar sobre cada categoria
 							while ($row_categoria = mysqli_fetch_assoc($result_categorias)) {
@@ -339,15 +312,13 @@ require_once "header.php";
 								$categoria_nome = $row_categoria['categoria'];
 
 								// Consulta para obter os 6 posts mais recentes da categoria atual
-								$query_posts = "
-                SELECT p.id, p.titulo, p.data_post, c.categoria AS categoria
-                FROM posts p
-                INNER JOIN categorias c ON p.categoria = c.id
-                WHERE p.categoria = ?
-                ORDER BY p.data_post DESC
-                LIMIT 6
-            ";
-								$stmt_posts = $mysqli->prepare($query_posts);
+								$stmt_posts = $mysqli->prepare("
+			SELECT id, titulo, data_post, slug
+			FROM posts
+			WHERE categoria = ?
+			ORDER BY data_post DESC
+			LIMIT 6
+		");
 								$stmt_posts->bind_param("i", $categoria_id);
 								$stmt_posts->execute();
 								$result_posts = $stmt_posts->get_result();
@@ -357,7 +328,8 @@ require_once "header.php";
 									$id = $row_post['id'];
 									$titulo = $row_post['titulo'];
 									$data_post = $row_post['data_post'];
-									$categoria = $row_post['categoria'];
+									$slug = $row_post['slug']; // Recupera o slug corretamente
+
 							?>
 									<li>
 										<a class="text-link" href="#"><?php echo htmlspecialchars($categoria_nome); ?></a>
@@ -366,18 +338,20 @@ require_once "header.php";
 											<li>
 												<?php
 												$data_inicial = new DateTime($data_post);
-												$data_atual = new DateTime(); // Data atual
+												$data_atual = new DateTime();
 												$intervalo = $data_inicial->diff($data_atual);
-												echo 'Publicado à ' . $intervalo->format('%a dias'); // Mostra a diferença em dias
+												echo 'Publicado há ' . $intervalo->format('%a dias');
 												?>
 											</li>
 										</ul>
 									</li>
 							<?php
 								}
+								$stmt_posts->close();
 							}
 							?>
 						</ul>
+
 					</div>
 
 				</div>
@@ -385,6 +359,7 @@ require_once "header.php";
 		</div>
 	</div>
 </section>
+
 <!-- End blog section -->
 
 <?php require "footer.php"; ?>
