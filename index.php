@@ -293,9 +293,8 @@ require_once "header.php";
 					<div class="widget social-widget">
 						<h2>Social</h2>
 						<ul class="social-list">
-							<li><a href="#"><i class="fa fa-facebook"></i>facebook</a></li>
-							<li><a href="#"><i class="fa fa-twitter"></i>twitter</a></li>
 							<li><a href="#"><i class="fa fa-instagram"></i>instagram</a></li>
+							<li><a href="#"><i class="fa fa-facebook"></i>facebook</a></li>
 						</ul>
 					</div>
 
