@@ -120,11 +120,10 @@ require "header.php";
 											$id        = $row['id'];
 											$titulo    = $row['titulo'];
 											$autor     = $row['autor'];
+											$slug      = $row['slug']; // Obtendo o slug do post
 											$categoria = $row['categoria'];
 											$data_post = $row['data_post'];
 											$imagem    = $row['imagem'];
-											$conteudo  = $row['conteudo'];
-											$destaque  = $row['destaque'];
 
 											// Consulta para obter o nome da categoria com base no ID
 											$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
@@ -139,7 +138,7 @@ require "header.php";
 														<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:114px;object-fit: cover;">
 													</div>
 													<a class="text-link" href="#"><?php echo $categoria_nome; ?></a>
-													<h2><a href="post?id=<?php echo $id; ?>"><?php echo $titulo; ?></a></h2>
+													<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2> <!-- Link usando o slug -->
 													<ul class="post-tags">
 														<li>by <a href="#"><?php echo $autor; ?></a></li>
 														<li>
@@ -161,6 +160,7 @@ require "header.php";
 									?>
 								</div>
 							</div>
+
 					</div>
 				</div>
 			</div>
