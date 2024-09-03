@@ -35,7 +35,7 @@ require_once "header.php";
                             <th class="text-center">Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody style="font-size: 0.8rem;">
                         <?php
                         $sql = $fetchonerecord->fetchdata();
                         while ($row = mysqli_fetch_array($sql)) {
@@ -62,7 +62,7 @@ require_once "header.php";
                                 <td><?php echo $destaque; ?></td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Ações">
-                                        <a href="edita_post?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm me-2"><i class="fas fa-edit"></i></a>
+                                        <a href="edita_post?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
                                         <a href="delete_post?del=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
                                     </div>
                                 </td>
