@@ -1,40 +1,38 @@
 <?php
-    require_once "functions/db_connect.php";
+require_once "functions/db_connect.php";
 
-    if (isset($_POST['email']) || isset($_POST['senha'])) {
+if (isset($_POST['email']) || isset($_POST['senha'])) {
 
-        $email = $mysqli->real_escape_string($_POST['email']);
-        $senha = $mysqli->real_escape_string($_POST['senha']);
+    $email = $mysqli->real_escape_string($_POST['email']);
+    $senha = $mysqli->real_escape_string($_POST['senha']);
 
-        $sql = "SELECT * FROM usuarios WHERE email = '$email' AND senha = '$senha'";
-        $sql_query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
+    $sql = "SELECT * FROM usuarios WHERE email = '$email' AND senha = '$senha'";
+    $sql_query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
 
-        $quantidade = $sql_query->num_rows;
+    $quantidade = $sql_query->num_rows;
 
-        if ($quantidade == 1) {
+    if ($quantidade == 1) {
 
-            $usuario = $sql_query->fetch_assoc();
+        $usuario = $sql_query->fetch_assoc();
 
-            if (!isset($_SESSION)) {
-                session_start();
-            }
+        if (!isset($_SESSION)) {
+            session_start();
+        }
 
-            $_SESSION['id'] = $usuario['id'];
-            $_SESSION['nome'] = $usuario['nome'];
+        $_SESSION['id'] = $usuario['id'];
+        $_SESSION['nome'] = $usuario['nome'];
 
-            header("Location: home");
-        } else {
-            echo "<div class='container'>
+        header("Location: home");
+    } else {
+        echo "<div class='container'>
                         <div class=\"alert alert-danger\">Dados de login incorretos, digite novamente seu login e senha </div>
                   <div>";
-        }
     }
+}
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

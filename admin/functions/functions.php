@@ -74,6 +74,14 @@ class Usuario
         $row = $result->fetch_assoc();
         return $row['total'];
     }
+
+    public function fetchCount()
+    {
+        $query = "SELECT COUNT(*) AS count FROM usuarios";
+        $result = mysqli_query($this->dbcon, $query);
+        $row = mysqli_fetch_assoc($result);
+        return $row['count'];
+    }
 }
 
 
@@ -144,6 +152,14 @@ class Categoria
         $result = $this->dbcon->query("SELECT COUNT(*) AS total FROM categorias");
         $row = $result->fetch_assoc();
         return $row['total'];
+    }
+
+    public function fetchCount()
+    {
+        $query = "SELECT COUNT(*) AS count FROM categorias";
+        $result = mysqli_query($this->dbcon, $query);
+        $row = mysqli_fetch_assoc($result);
+        return $row['count'];
     }
 }
 
@@ -279,6 +295,14 @@ class Post
         $stmt->close();
 
         return $result;
+    }
+
+    public function fetchCount()
+    {
+        $query = "SELECT COUNT(*) AS count FROM posts";
+        $result = mysqli_query($this->dbcon, $query);
+        $row = mysqli_fetch_assoc($result);
+        return $row['count'];
     }
 }
 
