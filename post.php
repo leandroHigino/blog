@@ -232,13 +232,7 @@ require "header.php";
 								$categoria_nome = $row_categoria['categoria'];
 
 								// Consulta para obter os 6 posts mais recentes da categoria atual
-								$stmt_posts = $mysqli->prepare("
-			SELECT id, titulo, data_post, slug
-			FROM posts
-			WHERE categoria = ?
-			ORDER BY data_post DESC
-			LIMIT 6
-		");
+								$stmt_posts = $mysqli->prepare("SELECT id, titulo, data_post, slug FROM posts WHERE categoria = ? ORDER BY data_post DESC LIMIT 1");
 								$stmt_posts->bind_param("i", $categoria_id);
 								$stmt_posts->execute();
 								$result_posts = $stmt_posts->get_result();

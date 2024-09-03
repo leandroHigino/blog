@@ -149,40 +149,22 @@ require_once "header.php";
 
 			<div class="owl-carousel" data-num="4">
 				<?php
-				$query = "SELECT * FROM posts ORDER BY data_post DESC";
+				// Consulta para selecionar todos os posts ordenados pela data de publicação de forma decrescente
+				$query = "SELECT p.*, c.categoria AS categoria_nome FROM posts p 
+						  JOIN categorias c ON p.categoria = c.id 
+						  ORDER BY p.id DESC";
 				$result = mysqli_query($mysqli, $query);
-
-				// Variável para rastrear se o último post foi destacado
-				$ultimoPostDestacado = false;
 
 				while ($row = mysqli_fetch_assoc($result)) {
 					$id        = $row['id'];
 					$titulo    = $row['titulo'];
 					$autor     = $row['autor'];
-					$categoria = $row['categoria'];
+					$categoria_nome = $row['categoria_nome'];
 					$data_post = $row['data_post'];
 					$imagem    = $row['imagem'];
 					$conteudo  = $row['conteudo'];
 					$destaque  = $row['destaque'];
 					$slug      = $row['slug'];
-
-					// Consulta para obter o nome da categoria com base no ID
-					$query_categoria = "SELECT categoria FROM categorias WHERE id = '$categoria'";
-					$result_categoria = mysqli_query($mysqli, $query_categoria);
-					$row_categoria = mysqli_fetch_assoc($result_categoria);
-					$categoria_nome = $row_categoria['categoria'];
-
-					// Verifica se este é o último post (última iteração do loop)
-					$ultimoPost = mysqli_num_rows($result) - 1;
-					$indicePostAtual = mysqli_num_rows($result) - 1;
-
-					if ($indicePostAtual == $ultimoPost && !$ultimoPostDestacado) {
-						// Este é o último post e ainda não foi destacado
-						$ultimoPostDestacado = true;
-						$isLastPost = true;
-					} else {
-						$isLastPost = false;
-					}
 				?>
 
 					<div class="item">
@@ -211,9 +193,10 @@ require_once "header.php";
 
 			</div>
 		</div>
-		<div class="border-bottom"></div>
+		<!-- <div class="border-bottom"></div> -->
 	</div>
 </section>
+
 
 <!-- End fresh section -->
 
@@ -242,7 +225,7 @@ require_once "header.php";
 							$categoria_nome = $row_categoria['categoria'];
 
 							// Consulta para obter o último post da categoria atual
-							$query_ultimo_post = "SELECT * FROM posts WHERE categoria = $categoria_id ORDER BY data_post DESC LIMIT 1";
+							$query_ultimo_post = "SELECT * FROM posts WHERE categoria = $categoria_id ORDER BY id DESC LIMIT 1";
 							$result_ultimo_post = mysqli_query($mysqli, $query_ultimo_post);
 							$row_ultimo_post = mysqli_fetch_assoc($result_ultimo_post);
 
@@ -274,7 +257,8 @@ require_once "header.php";
 											<li>Publicado há <?php echo $dias_passados; ?> dias</li>
 											<li>by <a href="#"><?php echo htmlspecialchars($autor); ?></a></li>
 										</ul>
-										<p><?php echo htmlspecialchars(substr($conteudo, 0, 100)); ?></p>
+										<p><?php echo nl2br(htmlspecialchars_decode(substr(strip_tags($conteudo), 0, 100))); ?>...</p>
+
 									</div>
 								</div>
 
@@ -311,13 +295,7 @@ require_once "header.php";
 								$categoria_nome = $row_categoria['categoria'];
 
 								// Consulta para obter os 6 posts mais recentes da categoria atual
-								$stmt_posts = $mysqli->prepare("
-			SELECT id, titulo, data_post, slug
-			FROM posts
-			WHERE categoria = ?
-			ORDER BY data_post DESC
-			LIMIT 6
-		");
+								$stmt_posts = $mysqli->prepare("SELECT id, titulo, data_post, slug FROM posts WHERE categoria = ? ORDER BY data_post DESC LIMIT 1");
 								$stmt_posts->bind_param("i", $categoria_id);
 								$stmt_posts->execute();
 								$result_posts = $stmt_posts->get_result();

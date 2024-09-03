@@ -11,35 +11,44 @@ $postsPorPagina = 6;
 $nomeCategoria = $_GET['categoria'];
 
 // Consulta para obter o ID da categoria
-$sqlCategoria = "SELECT id FROM categorias WHERE categoria = '$nomeCategoria'";
-$resultadoCategoria = mysqli_query($mysqli, $sqlCategoria);
-$rowCategoria = mysqli_fetch_assoc($resultadoCategoria);
+$sqlCategoria = "SELECT id FROM categorias WHERE categoria = ?";
+$stmt = $mysqli->prepare($sqlCategoria);
+$stmt->bind_param('s', $nomeCategoria);
+$stmt->execute();
+$resultadoCategoria = $stmt->get_result();
+$rowCategoria = $resultadoCategoria->fetch_assoc();
 $idCategoria = $rowCategoria['id'];
 
 // Obtém o número da página atual
-$paginaAtual = isset($_GET['pagina']) ? $_GET['pagina'] : 1;
+$paginaAtual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
 
 // Calcula o offset para a consulta SQL
 $offset = ($paginaAtual - 1) * $postsPorPagina;
 
 // Consulta para obter o total de posts da categoria
-$sqlTotalPosts = "SELECT COUNT(*) AS total FROM posts WHERE categoria = '$idCategoria'";
-$resultadoTotalPosts = mysqli_query($mysqli, $sqlTotalPosts);
-$rowTotalPosts = mysqli_fetch_assoc($resultadoTotalPosts);
+$sqlTotalPosts = "SELECT COUNT(*) AS total FROM posts WHERE categoria = ?";
+$stmt = $mysqli->prepare($sqlTotalPosts);
+$stmt->bind_param('i', $idCategoria);
+$stmt->execute();
+$resultadoTotalPosts = $stmt->get_result();
+$rowTotalPosts = $resultadoTotalPosts->fetch_assoc();
 $totalPosts = $rowTotalPosts['total'];
 
 // Calcula o número total de páginas
 $totalPaginas = ceil($totalPosts / $postsPorPagina);
 
 // Consulta para obter os posts da categoria com limite e offset
-$sqlPosts = "SELECT * FROM posts WHERE categoria = '$idCategoria' ORDER BY id DESC LIMIT $postsPorPagina OFFSET $offset";
-$resultadoPosts = mysqli_query($mysqli, $sqlPosts);
+$sqlPosts = "SELECT * FROM posts WHERE categoria = ? ORDER BY id DESC LIMIT ? OFFSET ?";
+$stmt = $mysqli->prepare($sqlPosts);
+$stmt->bind_param('iii', $idCategoria, $postsPorPagina, $offset);
+$stmt->execute();
+$resultadoPosts = $stmt->get_result();
 ?>
 
 <!-- page-banner section -->
 <section class="page-banner-section">
 	<div class="container">
-		<h1>Categoria: <span><?php echo $nomeCategoria; ?></span></h1>
+		<h1>Categoria: <span><?php echo htmlspecialchars($nomeCategoria); ?></span></h1>
 		<span><?php echo $totalPosts; ?> Posts encontrados</span>
 	</div>
 </section>
@@ -51,31 +60,31 @@ $resultadoPosts = mysqli_query($mysqli, $sqlPosts);
 		<div class="blog-box grid-style text-center">
 			<div class="row">
 				<?php
-				$count = 0; // Inicializa o contador de colunas
+				// Inicializa o contador de posts
+				$postCount = 0;
 
-				while ($row = mysqli_fetch_array($resultadoPosts)) {
-					$id = $row['id'];
-					$titulo = $row['titulo'];
-					$imagem = $row['imagem'];
-					$autor = $row['autor'];
-					$conteudo = $row['conteudo'];
+				while ($row = $resultadoPosts->fetch_assoc()) {
+					$id        = $row['id'];
+					$titulo    = $row['titulo'];
+					$imagem    = $row['imagem'];
+					$autor     = $row['autor'];
+					$conteudo  = $row['conteudo'];
 					$data_post = $row['data_post'];
-					$slug = $row['slug'];
+					$slug      = $row['slug'];
 
-					// Verifica se é o início de uma nova linha
-					if ($count % 3 == 0) {
-						echo '<div class="row">'; // Abre uma nova linha a cada 3 colunas
+					// Se for o início de uma nova linha e não for a primeira coluna, fecha a linha anterior
+					if ($postCount % 3 == 0 && $postCount != 0) {
+						echo '</div><div class="row">';
 					}
 				?>
 
 					<div class="col-lg-4 col-md-6">
 						<div class="news-post article-post">
 							<div class="image-holder">
-								<?php $uploadsPath = realpath("../admin/uploads/"); ?>
-								<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
+								<img src="admin/<?php echo htmlspecialchars($imagem); ?>" alt="" style="width:100%;height:250px;object-fit: cover;">
 							</div>
-							<a class="text-link" href="#"><?php echo $nomeCategoria; ?></a>
-							<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
+							<a class="text-link" href="#"><?php echo htmlspecialchars($nomeCategoria); ?></a>
+							<h2><a href="post?slug=<?php echo htmlspecialchars($slug); ?>"><?php echo htmlspecialchars($titulo); ?></a></h2>
 							<ul class="post-tags">
 								<li>
 									<?php
@@ -85,18 +94,19 @@ $resultadoPosts = mysqli_query($mysqli, $sqlPosts);
 									echo $intervalo->format('Publicado há %a dias'); // Mostra a diferença em dias
 									?>
 								</li>
-								<li>by <a href="#"><?php echo $autor; ?></a></li>
+								<li>by <a href="#"><?php echo htmlspecialchars($autor); ?></a></li>
 							</ul>
-							<p><?php echo substr($conteudo, 0, 100) . '...'; ?></p>
+							<p><?php echo nl2br(htmlspecialchars_decode(substr(strip_tags($conteudo), 0, 100))); ?>...</p>
 						</div>
 					</div>
 
 				<?php
-					// Verifica se é o fim de uma linha
-					if ($count % 3 == 2 || $count == mysqli_num_rows($resultadoPosts) - 1) {
-						echo '</div>'; // Fecha a linha após a terceira coluna ou no último post
-					}
-					$count++; // Incrementa o contador de colunas
+					$postCount++; // Incrementa o contador de posts
+				}
+
+				// Se houver posts, fecha a última linha aberta
+				if ($postCount % 3 != 0) {
+					echo '</div>';
 				}
 				?>
 			</div>
@@ -108,18 +118,18 @@ $resultadoPosts = mysqli_query($mysqli, $sqlPosts);
 					if ($totalPaginas > 1) {
 						if ($paginaAtual > 1) {
 							$paginaAnterior = $paginaAtual - 1;
-							echo "<li><a href='?nome=$nomeCategoria&pagina=$paginaAnterior'><i class='fa fa-angle-left'></i> Página Anterior</a></li>";
+							echo "<li><a href='?categoria=" . urlencode($nomeCategoria) . "&pagina=$paginaAnterior'><i class='fa fa-angle-left'></i> Página Anterior</a></li>";
 						}
 						for ($i = 1; $i <= $totalPaginas; $i++) {
 							if ($i == $paginaAtual) {
-								echo "<li><a href='?nome=$nomeCategoria&pagina=$i' class='active'>$i</a></li>";
+								echo "<li><a href='?categoria=" . urlencode($nomeCategoria) . "&pagina=$i' class='active'>$i</a></li>";
 							} else {
-								echo "<li><a href='?nome=$nomeCategoria&pagina=$i'>$i</a></li>";
+								echo "<li><a href='?categoria=" . urlencode($nomeCategoria) . "&pagina=$i'>$i</a></li>";
 							}
 						}
 						if ($paginaAtual < $totalPaginas) {
 							$proximaPagina = $paginaAtual + 1;
-							echo "<li><a href='?nome=$nomeCategoria&pagina=$proximaPagina'>Próxima Página <i class='fa fa-angle-right'></i></a></li>";
+							echo "<li><a href='?categoria=" . urlencode($nomeCategoria) . "&pagina=$proximaPagina'>Próxima Página <i class='fa fa-angle-right'></i></a></li>";
 						}
 					}
 					?>

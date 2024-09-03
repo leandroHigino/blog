@@ -48,10 +48,6 @@ $categorias = $categoriasManager->fetchCategorias();
 
                         </ul>
                     </div>
-                    <a class="search-button" href="#"><i class="fa fa-search"></i></a>
-                    <form class="form-search">
-                        <input type="search" placeholder="Buscar:" />
-                    </form>
                 </div>
             </nav>
         </header>

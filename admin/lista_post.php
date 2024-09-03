@@ -44,7 +44,6 @@ require_once "header.php";
                             // Buscar o nome da categoria com base no ID
                             $categoria_id = $row['categoria'];
                             $categoria_nome = $fetchonerecord->getCategoryName($categoria_id);
-
                         ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
@@ -61,14 +60,17 @@ require_once "header.php";
                                 <td><img src="<?php echo $row['imagem']; ?>" width="50" height="auto" /></td>
                                 <td><?php echo htmlspecialchars(substr(strip_tags($row['conteudo']), 0, 25)) . '...'; ?></td>
                                 <td><?php echo $destaque; ?></td>
-                                <td>
-                                    <a href="edita_post?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
-                                    <a href="delete_post?del=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group" aria-label="Ações">
+                                        <a href="edita_post?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm me-2"><i class="fas fa-edit"></i></a>
+                                        <a href="delete_post?del=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
+                                    </div>
                                 </td>
                             </tr>
                         <?php } ?>
                     </tbody>
                 </table>
+
             </div>
         </div>
     </div>
