@@ -257,7 +257,7 @@ require_once "header.php";
 											<li>Publicado há <?php echo $dias_passados; ?> dias</li>
 											<li>by <a href="#"><?php echo htmlspecialchars($autor); ?></a></li>
 										</ul>
-										<p><?php echo nl2br(htmlspecialchars_decode(substr(strip_tags($conteudo), 0, 100))); ?>...</p>
+										<p><?php echo nl2br(htmlspecialchars_decode(substr(strip_tags($conteudo), 0, 50))); ?>...</p>
 
 									</div>
 								</div>

@@ -323,7 +323,8 @@ class CategoriasManager
 
     public function fetchCategorias()
     {
-        $query = "SELECT id, categoria FROM categorias";
+        // $query = "SELECT id, categoria FROM categorias";
+        $query = "SELECT * FROM categorias ORDER BY id DESC";
         $result = $this->dbcon->query($query);
 
         if (!$result) {

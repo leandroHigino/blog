@@ -57,6 +57,7 @@ require "header.php";
 									<h1><?php echo $titulo; ?></h1>
 									<ul class="post-tags">
 										<li>Categoria: <a class="text-link" href="#"><?php echo $categoria; ?></a></li>
+										<li>Autor: <a class="text-link" href="#"><?php echo $autor; ?></a></li>
 										<li>
 											<?php
 											$data = $row['data_post'];
@@ -132,7 +133,7 @@ require "header.php";
 											$categoria_nome = $row_categoria['categoria'];
 									?>
 											<div class="col-lg-4 col-md-4">
-												<div class="news-post standard-post text-left">
+												<div class="news-post standard-post text-left" style="margin-bottom: 20px;">
 													<div class="image-holder">
 														<?php $uploadsPath = realpath("../admin/uploads/"); ?>
 														<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:114px;object-fit: cover;">
