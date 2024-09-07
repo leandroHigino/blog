@@ -112,7 +112,7 @@ $resultadoPosts = $stmt->get_result();
 			</div>
 
 			<!-- Pagination -->
-			<div class="pagination-box">
+			<div class="pagination-box text-center">
 				<ul class="pagination-list">
 					<?php
 					if ($totalPaginas > 1) {
