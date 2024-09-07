@@ -215,8 +215,8 @@ require_once "header.php";
 					<div class="iso-call">
 
 						<?php
-						// Consulta para obter as últimas postagens de cada categoria
-						$query_categorias = "SELECT id, categoria FROM categorias";
+						// Consulta para obter as últimas postagens de cada categoria em ordem decrescente
+						$query_categorias = "SELECT id, categoria FROM categorias ORDER BY id DESC";
 						$result_categorias = mysqli_query($mysqli, $query_categorias);
 
 						// Loop através de cada categoria
@@ -258,7 +258,6 @@ require_once "header.php";
 											<li>by <a href="#"><?php echo htmlspecialchars($autor); ?></a></li>
 										</ul>
 										<p><?php echo nl2br(htmlspecialchars_decode(substr(strip_tags($conteudo), 0, 50))); ?>...</p>
-
 									</div>
 								</div>
 
@@ -286,8 +285,8 @@ require_once "header.php";
 						<h2>Leia também</h2>
 						<ul class="list-posts">
 							<?php
-							// Consulta para obter todas as categorias
-							$result_categorias = mysqli_query($mysqli, "SELECT id, categoria FROM categorias");
+							// Consulta para obter todas as categorias em ordem decrescente
+							$result_categorias = mysqli_query($mysqli, "SELECT id, categoria FROM categorias ORDER BY id DESC");
 
 							// Iterar sobre cada categoria
 							while ($row_categoria = mysqli_fetch_assoc($result_categorias)) {
@@ -306,7 +305,6 @@ require_once "header.php";
 									$titulo = $row_post['titulo'];
 									$data_post = $row_post['data_post'];
 									$slug = $row_post['slug']; // Recupera o slug corretamente
-
 							?>
 									<li>
 										<a class="text-link" href="#"><?php echo htmlspecialchars($categoria_nome); ?></a>
@@ -328,14 +326,13 @@ require_once "header.php";
 							}
 							?>
 						</ul>
-
 					</div>
-
 				</div>
 			</div>
 		</div>
 	</div>
 </section>
+
 
 <!-- End blog section -->
 
