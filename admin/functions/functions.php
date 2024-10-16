@@ -308,6 +308,8 @@ class Post
 
 
 
+
+
 class CategoriasManager
 {
     private $dbcon;
