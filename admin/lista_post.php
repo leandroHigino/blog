@@ -28,7 +28,7 @@ require_once "header.php";
                             <th>Título</th>
                             <th>Autor</th>
                             <th>Categoria</th>
-                            <th>Data de Post</th>
+                            <th>Data</th>
                             <th>Imagem</th>
                             <th>Conteúdo</th>
                             <th>Destaque</th>
