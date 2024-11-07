@@ -22,7 +22,7 @@ require_once "header.php";
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-striped" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
+                    <thead style="font-size: 1rem;">
                         <tr>
                             <th>Id</th>
                             <th>Título</th>
