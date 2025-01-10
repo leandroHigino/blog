@@ -15,7 +15,7 @@ require_once "header.php";
 <div class="container-fluid">
 
     <!-- Page Heading -->
-    <h1 class="h3 mb-4 text-gray-800">Lista de Usuários</h1>
+    <h1 class="h3 mb-4 text-gray-800">Lista de Posts</h1>
 
     <!-- DataTales Example -->
     <div class="card shadow mb-4">
@@ -29,7 +29,7 @@ require_once "header.php";
                             <th>Autor</th>
                             <th>Categoria</th>
                             <th>Data</th>
-                            <th>Imagem</th>
+                            <th>Mídia</th>
                             <th>Conteúdo</th>
                             <th>Destaque</th>
                             <th class="text-center">Ações</th>
@@ -44,20 +44,29 @@ require_once "header.php";
                             // Buscar o nome da categoria com base no ID
                             $categoria_id = $row['categoria'];
                             $categoria_nome = $fetchonerecord->getCategoryName($categoria_id);
+                            $imagem = $row['imagem'];
+                            $video = $row['video'];
                         ?>
                             <tr>
                                 <td><?php echo $row['id']; ?></td>
                                 <td><?php echo htmlspecialchars(substr($row['titulo'], 0, 25)) . '...'; ?></td>
                                 <td><?php echo $row['autor']; ?></td>
                                 <td><?php echo $categoria_nome; ?></td>
+                                <td><?php echo date("d/m/Y", strtotime($row['data_post'])); ?></td>
                                 <td>
-                                    <?php
-                                    $data = $row['data_post'];
-                                    $data = date("d/m/Y", strtotime($data));
-                                    echo $data;
-                                    ?>
+                                    <?php if ($video): ?>
+                                        <!-- Exibe o vídeo como miniatura -->
+                                        <video width="50" height="30" controls>
+                                            <source src="<?php echo $video; ?>" type="video/mp4">
+                                        </video>
+                                    <?php elseif ($imagem): ?>
+                                        <!-- Exibe a imagem como miniatura -->
+                                        <img src="<?php echo $imagem; ?>" width="50" height="30" />
+                                    <?php else: ?>
+                                        <!-- Se não houver imagem ou vídeo, exibe um ícone genérico -->
+                                        <i class="fas fa-file"></i>
+                                    <?php endif; ?>
                                 </td>
-                                <td><img src="<?php echo $row['imagem']; ?>" width="50" height="auto" /></td>
                                 <td><?php echo htmlspecialchars(substr(strip_tags($row['conteudo']), 0, 25)) . '...'; ?></td>
                                 <td><?php echo $destaque; ?></td>
                                 <td class="text-center">

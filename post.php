@@ -21,13 +21,13 @@ require "header.php";
 				<div class="single-post">
 					<div class="single-post-content">
 						<?php
-						// Receber o ID do post enviado pela URL
+						// Receber o slug do post enviado pela URL
 						$slug = $_GET['slug'];
 
-						// Consulta para obter os dados do post com base no ID
+						// Consulta para obter os dados do post com base no slug
 						$query = "SELECT * FROM posts WHERE slug = '$slug'";
-
 						$result = mysqli_query($mysqli, $query);
+
 						while ($row = mysqli_fetch_assoc($result)) {
 							$id        = $row['id'];
 							$titulo    = $row['titulo'];
@@ -35,6 +35,7 @@ require "header.php";
 							$categoria = $row['categoria'];
 							$data_post = $row['data_post'];
 							$imagem    = $row['imagem'];
+							$video     = $row['video']; // Coluna de vídeo
 							$conteudo  = $row['conteudo'];
 							$destaque  = $row['destaque'];
 							$slug      = $row['slug'];
@@ -44,16 +45,24 @@ require "header.php";
 							$result_categoria = mysqli_query($mysqli, $query_categoria);
 							$row_categoria = mysqli_fetch_assoc($result_categoria);
 							$categoria = $row_categoria['categoria'];
-
-
-
 						?>
-							<?php $uploadsPath = realpath("../admin/uploads/"); ?>
-							<img src="admin/<?php echo $imagem; ?>" alt="">
+
+							<div class="post-media">
+								<?php if (!empty($imagem)) { ?>
+									<!-- Exibir a imagem -->
+									<?php $uploadsPath = realpath("../admin/uploads/"); ?>
+									<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%; height:auto;">
+								<?php } elseif (!empty($video)) { ?>
+									<!-- Exibir o vídeo -->
+									<video width="100%" height="auto" controls>
+										<source src="admin/<?php echo $video; ?>" type="video/mp4">
+										Seu navegador não suporta o elemento de vídeo.
+									</video>
+								<?php } ?>
+							</div>
 
 							<div class="post-content">
 								<div class="post-content-text">
-
 									<h1><?php echo $titulo; ?></h1>
 									<ul class="post-tags">
 										<li>Categoria: <a class="text-link" href="#"><?php echo $categoria; ?></a></li>
@@ -66,13 +75,10 @@ require "header.php";
 											?>
 										</li>
 									</ul>
-									<p>
-										<?php echo $conteudo; ?>
-									</p>
-
-
+									<p><?php echo $conteudo; ?></p>
 								</div>
 							</div>
+
 							<div class="prev-next-box">
 								<?php
 								// Consulta para obter o post anterior
@@ -99,9 +105,6 @@ require "header.php";
 								</div>
 							</div>
 
-
-
-
 							<div class="related-box">
 								<h2>Posts Relacionados</h2>
 								<div class="row">
@@ -121,7 +124,7 @@ require "header.php";
 											$id        = $row['id'];
 											$titulo    = $row['titulo'];
 											$autor     = $row['autor'];
-											$slug      = $row['slug']; // Obtendo o slug do post
+											$slug      = $row['slug'];
 											$categoria = $row['categoria'];
 											$data_post = $row['data_post'];
 											$imagem    = $row['imagem'];

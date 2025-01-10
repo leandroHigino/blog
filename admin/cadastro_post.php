@@ -16,26 +16,26 @@ if (isset($_POST['insert'])) {
     $conteudo = $_POST['conteudo'];
     $destaque = isset($_POST['destaque']) ? 1 : 0;
 
-    $imagem = ""; // Caminho da imagem no banco de dados
-    $imagem_path = "";
+    $imagem = "";
+    $video = "";
+    $media_path = "uploads/" . basename($_FILES["media"]["name"]);
+    $media_type = mime_content_type($_FILES["media"]["tmp_name"]);
 
-    // Verificar se um arquivo de imagem foi enviado
-    if (isset($_FILES["imagem"]["name"]) && $_FILES["imagem"]["error"] === UPLOAD_ERR_OK) {
-        $imagem_path = "uploads/" . basename($_FILES["imagem"]["name"]);
-
-        if (move_uploaded_file($_FILES["imagem"]["tmp_name"], $imagem_path)) {
-            $imagem = $imagem_path;
-            echo "<script>alert('Imagem enviada com sucesso!');</script>";
-        } else {
-            echo "<script>alert('Erro ao enviar a imagem!');</script>";
-        }
+    if (strpos($media_type, 'image') !== false) {
+        $imagem = $media_path;
+    } elseif (strpos($media_type, 'video') !== false) {
+        $video = $media_path;
     }
 
-    // Converta o título para UTF-8 de forma segura
+    if (move_uploaded_file($_FILES["media"]["tmp_name"], $media_path)) {
+        echo "<script>alert('Arquivo enviado com sucesso!');</script>";
+    } else {
+        echo "<script>alert('Erro ao enviar o arquivo!');</script>";
+    }
+
     $titulo = mb_convert_encoding($titulo, 'UTF-8', 'UTF-8');
 
-    // Insira o post no banco de dados
-    $sql = $insertdata->insert($titulo, $autor, $categoria, $data_post, $imagem, $conteudo, $slug, $destaque);
+    $sql = $insertdata->insert($titulo, $autor, $categoria, $data_post, $imagem, $video, $conteudo, $slug, $destaque);
 
     if ($sql) {
         echo "<script>alert('Post inserido com sucesso!');</script>";
@@ -49,18 +49,12 @@ if (isset($_POST['insert'])) {
 require_once "header.php";
 ?>
 
-
 <?php require_once "sidebar.php"; ?>
-
 <?php require_once "topbar.php"; ?>
 
-<!-- Begin Page Content -->
 <div class="container-fluid">
-
-    <!-- Page Heading -->
     <h1 class="h3 mb-4 text-gray-800">Cadastro de Post</h1>
 
-    <!-- Forms Example -->
     <div class="card shadow mb-4">
         <div class="card-body">
             <form method="post" enctype="multipart/form-data">
@@ -69,9 +63,7 @@ require_once "header.php";
                         <div class="form-group">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="" id="destaque" name="destaque">
-                                <label class="form-check-label" for="flexCheckIndeterminate">
-                                    Destaque
-                                </label>
+                                <label class="form-check-label" for="flexCheckIndeterminate">Destaque</label>
                             </div>
                         </div>
                     </div>
@@ -80,12 +72,12 @@ require_once "header.php";
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="titulo">Título</label>
-                            <input type="text" class="form-control form-control-user" id="titulo" name="titulo" aria-describedby="emailHelp" placeholder="Título" oninput="generateSlug()">
+                            <input type="text" class="form-control form-control-user" id="titulo" name="titulo" placeholder="Título" oninput="generateSlug()">
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
-                            <label for="categoria_id">Categoria</label>
+                            <label for="categoria">Categoria</label>
                             <select class="form-control" id="categoria" name="categoria">
                                 <?php
                                 $categorias = $fetchonerecord->fetchdata("categoria");
@@ -99,28 +91,28 @@ require_once "header.php";
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="slug">Slug</label>
-                            <input type="text" class="form-control form-control-user" id="slug" name="slug" aria-describedby="emailHelp" placeholder="Slug" readonly>
+                            <input type="text" class="form-control form-control-user" id="slug" name="slug" placeholder="Slug" readonly>
                         </div>
                     </div>
                 </div>
                 <br>
                 <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <div class="form-group">
                             <label for="autor">Autor</label>
-                            <input type="text" class="form-control form-control-user" id="autor" name="autor" aria-describedby="emailHelp" placeholder="">
+                            <input type="text" class="form-control form-control-user" id="autor" name="autor">
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <div class="form-group">
                             <label for="data_post">Data do Post</label>
-                            <input type="date" class="form-control form-control-user" id="data_post" name="data_post" aria-describedby="emailHelp" placeholder="">
+                            <input type="date" class="form-control form-control-user" id="data_post" name="data_post">
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
                         <div class="form-group">
-                            <label for="imagem">Imagem</label>
-                            <input type="file" class="form-control-file" id="imagem" name="imagem" accept="image/*">
+                            <label for="media">Imagem ou Vídeo</label>
+                            <input type="file" class="form-control-file" id="media" name="media" accept="image/*,video/*">
                         </div>
                     </div>
                 </div>
@@ -129,7 +121,7 @@ require_once "header.php";
                     <div class="col-lg-12">
                         <div class="form-group">
                             <label for="conteudo">Conteúdo</label>
-                            <textarea class="form-control form-control-user" id="conteudo" name="conteudo" row="5"></textarea>
+                            <textarea class="form-control form-control-user" id="conteudo" name="conteudo" rows="5"></textarea>
                         </div>
                     </div>
                 </div>
@@ -142,7 +134,6 @@ require_once "header.php";
         </div>
     </div>
 </div>
-<!-- /.container-fluid -->
 
 <script>
     function generateSlug() {
@@ -152,15 +143,14 @@ require_once "header.php";
     }
 
     function slugify(text) {
-        var slug = text.toString().toLowerCase()
+        return text.toString().toLowerCase()
             .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[̀-ͯ]/g, '')
             .replace(/\s+/g, '-')
             .replace(/[^\w\-]+/g, '')
             .replace(/\-\-+/g, '-')
             .replace(/^-+/, '')
             .replace(/-+$/, '');
-        return slug;
     }
 </script>
 <?php require_once "footer.php"; ?>

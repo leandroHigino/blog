@@ -39,6 +39,7 @@ require_once "header.php";
 								$categoria = $row['categoria'];
 								$data_post = $row['data_post'];
 								$imagem    = $row['imagem'];
+								$video     = $row['video']; // Campo de vídeo
 								$slug 	   = $row['slug'];
 
 								// Consulta para obter o nome da categoria com base no ID
@@ -49,7 +50,16 @@ require_once "header.php";
 							?>
 								<div class="item">
 									<div class="news-post image-post">
-										<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:540px;object-fit: cover;">
+										<?php if ($video): ?>
+											<!-- Exibir o vídeo se houver, com altura definida -->
+											<video style="width:100%;height:540px;object-fit:cover;">
+												<source src="admin/<?php echo $video; ?>" type="video/mp4">
+												Seu navegador não suporta o elemento de vídeo.
+											</video>
+										<?php elseif ($imagem): ?>
+											<!-- Exibir a imagem se houver -->
+											<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:540px;object-fit:cover;">
+										<?php endif; ?>
 										<div class="hover-post overlay-bg">
 											<a class="category-link" href="#"><?php echo $categoria; ?></a>
 											<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
@@ -61,6 +71,7 @@ require_once "header.php";
 									</div>
 								</div>
 							<?php } ?>
+
 						</div>
 					</div>
 				</div>
@@ -79,7 +90,7 @@ require_once "header.php";
 
 							// Consulta para obter o post mais recente da categoria atual
 							$query_posts = "
-								SELECT p.id, p.titulo, p.data_post, p.slug
+								SELECT p.id, p.titulo, p.data_post, p.slug, p.imagem, p.video
 								FROM posts p
 								WHERE p.categoria = ?
 								ORDER BY p.data_post DESC
@@ -94,6 +105,8 @@ require_once "header.php";
 								$titulo    = $row_post['titulo'];
 								$data_post = $row_post['data_post'];
 								$slug      = $row_post['slug'];
+								$imagem    = $row_post['imagem'];
+								$video     = $row_post['video']; // Adicionando campo de vídeo
 						?>
 								<li>
 									<a class="text-link" href="#"><?php echo htmlspecialchars($categoria_nome); ?></a>
@@ -134,6 +147,7 @@ require_once "header.php";
 	</div>
 </section>
 
+
 <!-- End trending section -->
 
 
@@ -146,7 +160,6 @@ require_once "header.php";
 			<h1>Posts Recentes</h1>
 		</div>
 		<div class="fresh-box owl-wrapper">
-
 			<div class="owl-carousel" data-num="4">
 				<?php
 				// Consulta para selecionar todos os posts ordenados pela data de publicação de forma decrescente
@@ -156,22 +169,31 @@ require_once "header.php";
 				$result = mysqli_query($mysqli, $query);
 
 				while ($row = mysqli_fetch_assoc($result)) {
-					$id        = $row['id'];
-					$titulo    = $row['titulo'];
-					$autor     = $row['autor'];
+					$id           = $row['id'];
+					$titulo       = $row['titulo'];
+					$autor        = $row['autor'];
 					$categoria_nome = $row['categoria_nome'];
-					$data_post = $row['data_post'];
-					$imagem    = $row['imagem'];
-					$conteudo  = $row['conteudo'];
-					$destaque  = $row['destaque'];
-					$slug      = $row['slug'];
+					$data_post    = $row['data_post'];
+					$imagem       = $row['imagem'];
+					$video        = $row['video']; // Adicionando campo de vídeo
+					$conteudo     = $row['conteudo'];
+					$destaque     = $row['destaque'];
+					$slug         = $row['slug'];
 				?>
 
 					<div class="item">
 						<div class="news-post standard-post">
 							<div class="image-holder">
-								<?php $uploadsPath = realpath("../admin/uploads/"); ?>
-								<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:180px;object-fit: cover;">
+								<?php if ($video): ?>
+									<!-- Exibe o vídeo se estiver presente -->
+									<video style="width:100%;height:180px;object-fit: cover;">
+										<source src="admin/<?php echo $video; ?>" type="video/mp4">
+										Seu navegador não suporta o elemento de vídeo.
+									</video>
+								<?php elseif ($imagem): ?>
+									<!-- Exibe a imagem se estiver presente -->
+									<img src="admin/<?php echo $imagem; ?>" alt="" style="width:100%;height:180px;object-fit: cover;">
+								<?php endif; ?>
 							</div>
 							<a class="category-link" style="color:white;"><?php echo $categoria_nome; ?></a>
 							<h2><a href="post?slug=<?php echo $slug; ?>"><?php echo $titulo; ?></a></h2>
@@ -196,6 +218,7 @@ require_once "header.php";
 		<!-- <div class="border-bottom"></div> -->
 	</div>
 </section>
+
 
 
 <!-- End fresh section -->
@@ -236,6 +259,7 @@ require_once "header.php";
 								$autor = $row_ultimo_post['autor'];
 								$data_post = $row_ultimo_post['data_post'];
 								$imagem = $row_ultimo_post['imagem'];
+								$video = $row_ultimo_post['video']; // Adicionando campo de vídeo
 								$conteudo = $row_ultimo_post['conteudo'];
 								$slug = $row_ultimo_post['slug'];
 
@@ -249,7 +273,16 @@ require_once "header.php";
 								<div class="item">
 									<div class="news-post article-post">
 										<div class="image-holder">
-											<img src="admin/<?php echo htmlspecialchars($imagem); ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
+											<?php if ($video): ?>
+												<!-- Exibe o vídeo se estiver presente -->
+												<video style="width:100%;height:234px;object-fit: cover;">
+													<source src="admin/<?php echo htmlspecialchars($video); ?>" type="video/mp4">
+													Seu navegador não suporta o elemento de vídeo.
+												</video>
+											<?php elseif ($imagem): ?>
+												<!-- Exibe a imagem se estiver presente -->
+												<img src="admin/<?php echo htmlspecialchars($imagem); ?>" alt="" style="width:100%;height:234px;object-fit: cover;">
+											<?php endif; ?>
 										</div>
 										<a class="text-link" href="#"><?php echo htmlspecialchars($categoria_nome); ?></a>
 										<h2><a href="post?slug=<?php echo urlencode($slug); ?>"><?php echo htmlspecialchars($titulo); ?></a></h2>

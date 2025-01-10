@@ -185,8 +185,8 @@ class Post
             }
         }
 
-        $stmt = $this->dbcon->prepare("INSERT INTO posts (titulo, autor, categoria, data_post, imagem, conteudo, slug, destaque) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssssssi", ...$params);
+        $stmt = $this->dbcon->prepare("INSERT INTO posts (titulo, autor, categoria, data_post, imagem, video, conteudo, slug, destaque) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssssssi", ...$params);
         $result = $stmt->execute();
         $stmt->close();
 
@@ -221,15 +221,15 @@ class Post
         return $categoria_nome;
     }
 
-    public function update($titulo, $autor, $categoria, $data_post, $imagem, $conteudo, $slug, $destaque, $postid)
+    public function update($titulo, $autor, $categoria, $data_post, $imagem, $video, $conteudo, $slug, $destaque, $postid)
     {
-        // Obter a imagem atual do post antes de executar a atualização
-        $stmt_get_image = $this->dbcon->prepare("SELECT imagem FROM posts WHERE id = ?");
-        $stmt_get_image->bind_param("i", $postid);
-        $stmt_get_image->execute();
-        $stmt_get_image->bind_result($imagem_atual);
-        $stmt_get_image->fetch();
-        $stmt_get_image->close();
+        // Obter a imagem e vídeo atuais do post antes de executar a atualização
+        $stmt_get_media = $this->dbcon->prepare("SELECT imagem, video FROM posts WHERE id = ?");
+        $stmt_get_media->bind_param("i", $postid);
+        $stmt_get_media->execute();
+        $stmt_get_media->bind_result($imagem_atual, $video_atual);
+        $stmt_get_media->fetch();
+        $stmt_get_media->close();
 
         // Verificar se uma nova imagem foi enviada
         if (empty($imagem)) {
@@ -242,14 +242,26 @@ class Post
             }
         }
 
+        // Verificar se um novo vídeo foi enviado
+        if (empty($video)) {
+            // Se não houver novo vídeo, manter o vídeo atual
+            $video = $video_atual;
+        } else {
+            // Se houver um novo vídeo, remover o vídeo atual do servidor
+            if (!empty($video_atual) && file_exists($video_atual)) {
+                unlink($video_atual); // Remover o vídeo antigo do servidor
+            }
+        }
+
         // Preparar e executar a atualização do post
-        $stmt = $this->dbcon->prepare("UPDATE posts SET titulo = ?, autor = ?, categoria = ?, data_post = ?, imagem = ?, conteudo = ?, slug = ?, destaque = ? WHERE id = ?");
-        $stmt->bind_param("ssssssssi", $titulo, $autor, $categoria, $data_post, $imagem, $conteudo, $slug, $destaque, $postid);
+        $stmt = $this->dbcon->prepare("UPDATE posts SET titulo = ?, autor = ?, categoria = ?, data_post = ?, imagem = ?, video = ?, conteudo = ?, slug = ?, destaque = ? WHERE id = ?");
+        $stmt->bind_param("sssssssssi", $titulo, $autor, $categoria, $data_post, $imagem, $video, $conteudo, $slug, $destaque, $postid);
         $result = $stmt->execute();
         $stmt->close();
 
         return $result;
     }
+
 
 
     public function delete($postid)

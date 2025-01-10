@@ -7,6 +7,7 @@ $fetchonerecord = new Categoria();
 $updatepost = new Post();
 
 // Processar formulário de atualização
+// Processar formulário de atualização
 if (isset($_POST['update'])) {
     $postid = $_GET['id'];
     $titulo = htmlspecialchars($_POST['titulo']); // Sanitize título
@@ -16,12 +17,14 @@ if (isset($_POST['update'])) {
     $data_post = $_POST['data_post'];
     $conteudo = $_POST['conteudo'];
     $destaque = isset($_POST['destaque']) ? 1 : 0;
+    $video = $_POST['video']; // Novo campo de vídeo
 
-    // Obter o post atual para recuperar o caminho da imagem atual
+    // Obter o post atual para recuperar o caminho da imagem ou vídeo atual
     $post = $updatepost->fetchonerecord($postid);
     if ($post && $post->num_rows > 0) {
         $row = $post->fetch_assoc();
         $imagem_atual = $row['imagem']; // Caminho da imagem atual do post
+        $video_atual = $row['video'];  // Caminho do vídeo atual
     } else {
         // Lidar com o caso em que o post não é encontrado
         echo "<script>alert('Post não encontrado!');</script>";
@@ -44,22 +47,48 @@ if (isset($_POST['update'])) {
             if (move_uploaded_file($_FILES["imagem"]["tmp_name"], $imagem_path)) {
                 // Usar o caminho da nova imagem
                 $imagem_atual = $imagem_path;
-                echo "<script>alert('Imagem enviada com sucesso!');</script>";
+                $video_atual = null; // Remover o vídeo se a imagem for substituída
             } else {
                 echo "<script>alert('Erro ao enviar a imagem!');</script>";
             }
         } else {
             echo "<script>alert('O arquivo selecionado não é uma imagem válida!');</script>";
         }
-    } else {
-        // Usar a imagem atual se não houver uma nova imagem
-        $post_data = $post->fetch_assoc(); // Recuperar os dados do post
-        $imagem_atual = $post_data['imagem']; // Usar a imagem atual
     }
 
+    // Verificar se um novo vídeo foi enviado
+    if (!empty($_FILES["video"]["name"])) {
+        // Novo arquivo de vídeo selecionado
+        $video_name = $_FILES["video"]["name"];
+        $video_name = str_replace(' ', '_', $video_name); // Substituir espaços por underscores
+
+        $video_path = "uploads/" . basename($video_name);
+
+        // Validar o tipo de arquivo
+        $video_type = mime_content_type($_FILES["video"]["tmp_name"]);
+        if (strpos($video_type, 'video') !== false) {
+            // Mover o arquivo para o diretório de uploads
+            if (move_uploaded_file($_FILES["video"]["tmp_name"], $video_path)) {
+                // Usar o caminho do novo vídeo
+                $video_atual = $video_path;
+                $imagem_atual = null; // Remover a imagem se o vídeo for substituído
+            } else {
+                echo "<script>alert('Erro ao enviar o vídeo!');</script>";
+            }
+        } else {
+            echo "<script>alert('O arquivo selecionado não é um vídeo válido!');</script>";
+        }
+    }
+
+    // Se não houver imagem ou vídeo, manter os arquivos atuais
+    if (empty($_FILES["imagem"]["name"]) && empty($_FILES["video"]["name"])) {
+        // Não houve troca de mídia, manter os arquivos atuais
+        $imagem_atual = $imagem_atual ? $imagem_atual : null;
+        $video_atual = $video_atual ? $video_atual : null;
+    }
 
     // Atualizar o post no banco de dados
-    $sql = $updatepost->update($titulo, $autor, $categoria, $data_post, $imagem_atual, $conteudo, $slug, $destaque, $postid);
+    $sql = $updatepost->update($titulo, $autor, $categoria, $data_post, $imagem_atual, $video_atual, $conteudo, $slug, $destaque, $postid);
 
     if ($sql) {
         echo "<script>alert('Post atualizado com sucesso!');</script>";
@@ -70,6 +99,7 @@ if (isset($_POST['update'])) {
     }
 }
 
+
 // Carregar dados do post para edição
 $postid = $_GET['id'];
 $post = $updatepost->fetchonerecord($postid);
@@ -79,6 +109,7 @@ require_once "header.php";
 require_once "sidebar.php";
 require_once "topbar.php";
 ?>
+
 
 <!-- Begin Page Content -->
 <div class="container-fluid">
@@ -137,7 +168,7 @@ require_once "topbar.php";
                     </div>
                     <br>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-2">
                             <div class="form-group">
                                 <label for="autor">Autor</label>
                                 <input type="text" class="form-control form-control-user" id="autor" name="autor" aria-describedby="emailHelp" placeholder="" value="<?php echo htmlspecialchars($row['autor']); ?>">
@@ -151,37 +182,62 @@ require_once "topbar.php";
                         </div>
                         <div class="col-lg-3">
                             <div class="form-group">
-                                <label for="imagem">Imagem</label>
-                                <input type="file" class="form-control-file" id="imagem" name="imagem" accept="image/*">
+                                <label for="imagem">Imagem ou Vídeo</label>
+                                <!-- Se existe imagem, exibe a imagem e permite alterar a imagem -->
+                                <?php if (!empty($row['imagem'])) { ?>
+                                    <div style="display: flex; align-items: center;">
+                                        <input type="file" class="form-control-file" id="imagem" name="imagem" accept="image/*">
+                                    </div>
+                                <?php } ?>
+                                <!-- Se existe vídeo, exibe o vídeo e permite alterar o vídeo -->
+                                <?php if (!empty($row['video'])) { ?>
+                                    <div style="display: flex; align-items: center;">
+                                        <video width="50%" height="auto" style="margin-right: 10px;" controls>
+                                            <source src="<?php echo $row['video']; ?>" type="video/mp4">
+                                            Seu navegador não suporta o elemento de vídeo.
+                                        </video>
+                                        <input type="file" class="form-control-file" id="video" name="video" accept="video/*">
+                                    </div>
+                                <?php } ?>
+                                <!-- Se não existe nem imagem nem vídeo, exibe ambos os inputs vazios -->
+                                <?php if (empty($row['imagem']) && empty($row['video'])) { ?>
+                                    <input type="file" class="form-control-file" id="imagem" name="imagem" accept="image/*">
+                                    <input type="file" class="form-control-file" id="video" name="video" accept="video/*">
+                                <?php } ?>
                             </div>
                         </div>
-                        <div class="col-lg-2">
+                        <div class="col-lg-4">
                             <div class="form-group">
-                                <label for="imagem">Imagem Atual</label><br>
-                                <img src="<?php echo $row['imagem']; ?>" width="100%" height="auto" />
+                                <label for="imagem">Mídia atual</label>
+                                <?php if (!empty($row['imagem'])) { ?>
+                                    <img src="<?php echo $row['imagem']; ?>" alt="Imagem atual" width="100%">
+                                <?php } elseif (!empty($row['video'])) { ?>
+                                    <video width="100%" controls>
+                                        <source src="<?php echo $row['video']; ?>" type="video/mp4">
+                                        Seu navegador não suporta o elemento de vídeo.
+                                    </video>
+                                <?php } else { ?>
+                                    <p>Não há mídia registrada.</p>
+                                <?php } ?>
                             </div>
                         </div>
+
                     </div>
-                    <br>
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label for="conteudo">Conteúdo</label>
-                                <textarea class="form-control form-control-user" id="conteudo" name="conteudo" row="5"><?php echo $row['conteudo']; ?></textarea>
+                                <textarea name="conteudo" id="conteudo" class="form-control"><?php echo $row['conteudo']; ?></textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <button type="submit" class="btn btn-primary" name="update">Atualizar Post</button>
-                        </div>
-                    </div>
+                    <input type="submit" class="btn btn-success" value="Atualizar" name="update">
                 </form>
             <?php } ?>
         </div>
     </div>
 </div>
-<!-- /.container-fluid -->
+<!-- End of Page Content -->
 
 <script>
     function generateSlug() {
@@ -203,7 +259,7 @@ require_once "topbar.php";
     }
 </script>
 
+<!-- Incluir rodapé -->
 <?php
-// Incluir rodapé
 require_once "footer.php";
 ?>
