@@ -145,15 +145,12 @@ require_once "header.php";
 			</div>
 		</div>
 	</div>
-</section>
-
-
-<!-- End trending section -->
+</section><!-- End trending section -->
 
 
 
 <!-- fresh-section 
-			================================================== -->
+ ================================================== -->
 <section class="fresh-section">
 	<div class="container">
 		<div class="title-section text-center">
@@ -217,11 +214,7 @@ require_once "header.php";
 		</div>
 		<!-- <div class="border-bottom"></div> -->
 	</div>
-</section>
-
-
-
-<!-- End fresh section -->
+</section><!-- End fresh section -->
 
 
 <!-- blog section 

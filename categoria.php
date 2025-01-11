@@ -67,6 +67,7 @@ $resultadoPosts = $stmt->get_result();
 					$id        = $row['id'];
 					$titulo    = $row['titulo'];
 					$imagem    = $row['imagem'];
+					$video     = $row['video']; // Adicionado para verificar o vídeo
 					$autor     = $row['autor'];
 					$conteudo  = $row['conteudo'];
 					$data_post = $row['data_post'];
@@ -77,11 +78,19 @@ $resultadoPosts = $stmt->get_result();
 						echo '</div><div class="row">';
 					}
 				?>
-
 					<div class="col-lg-4 col-md-6">
 						<div class="news-post article-post">
 							<div class="image-holder">
-								<img src="admin/<?php echo htmlspecialchars($imagem); ?>" alt="" style="width:100%;height:250px;object-fit: cover;">
+								<?php if (!empty($video)) : ?>
+									<!-- Exibe o vídeo se estiver disponível -->
+									<video controls style="width:100%;height:250px;object-fit: cover;">
+										<source src="admin/<?php echo htmlspecialchars($video); ?>" type="video/mp4">
+										Seu navegador não suporta vídeos.
+									</video>
+								<?php elseif (!empty($imagem)) : ?>
+									<!-- Exibe a imagem se estiver disponível -->
+									<img src="admin/<?php echo htmlspecialchars($imagem); ?>" alt="" style="width:100%;height:250px;object-fit: cover;">
+								<?php endif; ?>
 							</div>
 							<a class="text-link" href="#"><?php echo htmlspecialchars($nomeCategoria); ?></a>
 							<h2><a href="post?slug=<?php echo htmlspecialchars($slug); ?>"><?php echo htmlspecialchars($titulo); ?></a></h2>
@@ -89,9 +98,9 @@ $resultadoPosts = $stmt->get_result();
 								<li>
 									<?php
 									$data_inicial = new DateTime($data_post);
-									$data_atual = new DateTime(); // Data atual
+									$data_atual = new DateTime();
 									$intervalo = $data_inicial->diff($data_atual);
-									echo $intervalo->format('Publicado há %a dias'); // Mostra a diferença em dias
+									echo $intervalo->format('Publicado há %a dias');
 									?>
 								</li>
 								<li>by <a href="#"><?php echo htmlspecialchars($autor); ?></a></li>
@@ -99,9 +108,8 @@ $resultadoPosts = $stmt->get_result();
 							<p><?php echo nl2br(htmlspecialchars_decode(substr(strip_tags($conteudo), 0, 30))); ?></p>
 						</div>
 					</div>
-
 				<?php
-					$postCount++; // Incrementa o contador de posts
+					$postCount++;
 				}
 
 				// Se houver posts, fecha a última linha aberta
